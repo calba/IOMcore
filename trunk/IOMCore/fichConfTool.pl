@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-#$Id: fichConfTool.pl,v 1.2 2002-11-25 13:50:56 calba Exp $
+#$Id: fichConfTool.pl,v 1.3 2003-02-10 17:28:16 calba Exp $
 
 use strict;
 use diagnostics;
@@ -27,6 +27,7 @@ my @Opciones=( 'PARSERCONF|cf=s',
                'GCONFIPARSERST|ps=s',
                'GCONFIDATOSPM|xp=s',
                'GCONFIDATOSST|xs=s',
+               'ENTORNO|e!',
                'h|?' => \&Ayuda
               );
 
@@ -90,7 +91,17 @@ foreach $fichconf (@ARGV)
 { LeeFichConf(%ConfDatos,%ConfParser,$fichconf);
 };
 
-if (defined($CONFIG{'GCONFIDATOSST'}))
+if (defined($CONFIG{'ENTORNO'}))
+{ my ($clave,@claves);
+
+  @claves=grep { !(ref($ConfDatos{$_})); } (keys %ConfDatos);
+
+  if (@claves)
+  { map { print "$_=\"$ConfDatos{$_}\"\n"; } (@claves);
+    print "export ","@claves ","\n";
+  };
+  exit (0);
+} elsif (defined($CONFIG{'GCONFIDATOSST'}))
 { my $fichname;
 
   if (defined($CONFIG{'FICHSAL'}))
@@ -119,7 +130,7 @@ if (defined($CONFIG{'GCONFIDATOSST'}))
   VuelcaModulo($fichname,$CONFIG{'GCONFIDATOSPM'},"CONFIG",%ConfDatos);
   exit 0;
 } else
-{ print STDERR "ORROR: No se ha indicado que hacer con el/los fichero(s) de configuracion leido(s) (opcion -xp o -xs)\n";
+{ print STDERR "ORROR: No se ha indicado que hacer con el/los fichero(s) de configuracion leido(s) (opciones -e o -xp o -xs)\n";
   Ayuda("","");
 };
 
@@ -134,7 +145,7 @@ sub Ayuda($$)
 fichConfTool.pl: Herramienta auxiliar para manejo de ficheros de configuracion
 
 Uso: 
-fichConfTool.pl [-h][-?] {-cf sintaxis.cfg | -cm sintaxis.pm} { -pp modulossint.pm | -ps modulosint.pl | -xp datosconf.pm | -xs datosconf.pl [-o fichsalida] ficheroconf.cfg ...
+fichConfTool.pl [-h][-?] {-cf sintaxis.cfg | -cm sintaxis.pm} { -pp modulossint.pm | -ps modulosint.pl | -xp datosconf.pm | -xs datosconf.pl | -e } [-o fichsalida] ficheroconf.cfg ...
 
 -h Esta pantalla
 -? Esta pantalla
@@ -144,6 +155,8 @@ fichConfTool.pl [-h][-?] {-cf sintaxis.cfg | -cm sintaxis.pm} { -pp modulossint.
 -ps nombrehash Genera un fichero con un hash susceptible de require o C&P
 -xp datosconf.pm Genera un modulo perl con los datos de configuracion real
 -xs nombrehash Genera un fichero perl para require o C&P con la configuracion
+-e             Saca las variables base escalares por salida estandar como 
+               variables de entorno. Ideal para hacer 'eval'.
 -o fichsalida Nombre del fichero de salida. Por defecto: salida estándar.
 
 FIN
