@@ -21,7 +21,7 @@ sub Include($);
 sub IncludeC(\%$);
 
 sub Include($)
-{ return IncludeC(%FLvoid,@_);
+{ return IncludeC(%FLvoid,@_[0]);
 };
 
 
@@ -60,11 +60,14 @@ Este modulo carga un fichero y lo almacena en memoria. No se hace ningun tipo de
 
 =head1 Version
 
-$Id: Include.pm,v 1.3 2003-12-26 20:52:24 calba Exp $
+$Id: Include.pm,v 1.4 2004-12-26 19:39:07 calba Exp $
 
 =head1 Cambios
 
 $Log: not supported by cvs2svn $
+Revision 1.3  2003/12/26 20:52:24  calba
+- Añadido IncludeC para que las trazas las ponga en el fichero de log y no por la salida de error
+
 Revision 1.2  2003/01/30 11:01:56  calba
 Añadida documentacion en POD
 
