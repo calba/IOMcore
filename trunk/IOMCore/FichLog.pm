@@ -18,17 +18,18 @@ $VERSION = 1.00;              # Or higher
 use vars qw( %FLvoid );
 %FLvoid=();
 
-sub printLOG(\%$);
+sub printLOG(\%@);
 sub printLOGmask(\%$@);
 sub printLOGlevel(\%$@);
 
-sub printLOG(\%$)
+sub printLOG(\%@)
 { my $CONFIG=shift;
-  my $cadena = shift;
+  my $cadena;
   my ($flag)=0;
   my $linea;
   local *HANDERR;
 
+  $cadena=join("",@_);
   $linea = scalar(localtime)." [$$] $cadena\n";
 
   *HANDERR = *STDERR;
@@ -48,22 +49,7 @@ sub printLOGlevel(\%$@)
   my $level=shift;
 
   if (defined($CONFIG->{'LOG'}) && ($level >= $CONFIG->{'LOG'}))
-  { my ($flag)=0;
-    my $linea;
-    my $cadena = join("",@_);
-    local *HANDERR;
-    *HANDERR = *STDERR;
-
-    $linea = scalar(localtime)." [$$] $cadena\n";
-    if (defined($CONFIG->{'LOGFILE'}))
-    { $flag=1;
-      open(HANDERR,">>".$CONFIG->{'LOGFILE'}) || do
-      { *HANDERR = *STDERR;
-        $flag=0;
-      };
-    };
-    print HANDERR $linea;
-    close HANDERR if ($flag);
+  { printLOG(%{$CONFIG},@_);
   };
 };
 
@@ -72,22 +58,7 @@ sub printLOGmask(\%$@)
   my $mask=shift;
 
   if (defined($CONFIG->{'LOG'}) && ($mask & $CONFIG->{'LOG'}))
-  { my ($flag)=0;
-    my $linea;
-    my $cadena = join("",@_);
-    local *HANDERR;
-    *HANDERR = *STDERR;
-
-    $linea = scalar(localtime)." [$$] $cadena\n";
-    if (defined($CONFIG->{'LOGFILE'}))
-    { $flag=1;
-      open(HANDERR,">>".$CONFIG->{'LOGFILE'}) || do
-      { *HANDERR = *STDERR;
-        $flag=0;
-      };
-    };
-    print HANDERR $linea;
-    close HANDERR if ($flag);
+  { printLOG(%{$CONFIG},@_);
   };
 };
 
