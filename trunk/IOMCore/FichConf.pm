@@ -71,7 +71,7 @@ sub LeeFichConf(\%\%$)
        $VALMODO=$valor;
        next LOO;
      };
-     if ($MODO && $VALMODO && defined($PARSECONF{'SUBBASES'}{$MODO}{$clave}))
+     if ($MODO && ($VALMODO ne "") && defined($PARSECONF{'SUBBASES'}{$MODO}{$clave}))
      { if ($PARSECONF{'SUBBASES'}{$MODO}{$clave}{'TIPO'} eq "\$")
        { $CONFIG->{$MODO}{$VALMODO}{$clave}=$valor;
        } else
