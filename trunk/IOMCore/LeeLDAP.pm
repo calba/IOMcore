@@ -7,10 +7,11 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
 $VERSION = 1.00;              # Or higher
+#$VERSION = do { my @r = (q$Revision: 1.2 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA = qw(Exporter);
 
-@EXPORT      = qw( SacaEntradaLDAP );
-@EXPORT_OK   = qw( SacaEntradaLDAP );
+@EXPORT      = qw( SacaEntradaLDAP ValorLDAP );
+@EXPORT_OK   = qw( SacaEntradaLDAP ValorLDAP );
 %EXPORT_TAGS = ( );
 
 ##########################################################################
@@ -18,6 +19,7 @@ $VERSION = 1.00;              # Or higher
 use Net::LDAP;
 
 sub SacaEntradaLDAP(\%$);
+sub ValorLDAP(\%$;$);
 
 sub SacaEntradaLDAP(\%$)
 { my $CONFIG=shift;
@@ -62,6 +64,23 @@ sub SacaEntradaLDAP(\%$)
   return %resul;
 };
 
+sub ValorLDAP(\%$;$)
+{ my $entradaLDAP=shift;
+  my $clave=shift;
+  my $separador=shift||"";
+
+  my $resul;
+
+  return "" unless defined $entradaLDAP->{$clave};
+
+  $resul=join($separador,sort keys %{$entradaLDAP->{$clave}});
+
+  return $resul;
+};
+
+
+
+
 1;
 
 =head1 NAME
@@ -76,6 +95,7 @@ IOMCore::LeeLDAP - Efectua una consulta LDAP y almacena las respuestas en un has
             'LDAP_BASE'=>'mybase');
 
   %resul=SacaEntradaLDAP( %CONFIG, "mifiltro");
+  
 
 =head1 DESCRIPCION
 
@@ -111,10 +131,13 @@ $VAR1 = {
 
 =head1 Version
 
-$Id: LeeLDAP.pm,v 1.1 2003-06-17 18:12:21 calba Exp $
+$Id: LeeLDAP.pm,v 1.2 2003-07-09 18:40:12 calba Exp $
 
 =head1 Cambios
 
 $Log: not supported by cvs2svn $
+Revision 1.1  2003/06/17 18:12:21  calba
+Carga inicial.
+
 
 =cut
