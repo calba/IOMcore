@@ -7,8 +7,8 @@ use Exporter;
 $VERSION = 1.00;              # Or higher
 @ISA = qw(Exporter);
 
-@EXPORT      = qw(LeeFichConf ParseFich GenConfParser LeeFichConfParser);
-@EXPORT_OK   = qw(LeeFichConf ParseFich GenConfParser LeeFichConfParser);
+@EXPORT_OK = @EXPORT = qw(LeeFichConf ParseFich GenConfParser
+                          LeeFichConfParser);
 
 ##########################################################################
 
@@ -55,9 +55,31 @@ sub LeeFichConf(\%\%$)
     ($clave,$valor)=split(/\s+/,$linea,2);
     $clave=uc($clave);
 
-    next unless (defined($valor));
 
     LOO: {
+     if ($clave =~ m/^FIN$/)
+     { $MODO="";
+       $VALMODO="";
+       next LOO;
+     };
+     next LOO unless (defined($valor));
+
+     if (defined($PARSECONF{'CLAVES'}{$clave}))
+     { $MODO=$clave;
+       $VALMODO=$valor;
+       next LOO;
+     };
+     if ($MODO && 
+         ($VALMODO ne "") && 
+         defined($PARSECONF{'SUBBASES'}{$MODO}{$clave})
+        )
+     { if ($PARSECONF{'SUBBASES'}{$MODO}{$clave}{'TIPO'} eq "\$")
+       { $CONFIG->{$MODO}{$VALMODO}{$clave}=$valor;
+       } else
+       { push (@{$CONFIG->{$MODO}{$VALMODO}{$clave}},$valor);
+       };
+       next LOO;
+     };
      if(defined($PARSECONF{'BASES'}{$clave}))
      { if ($PARSECONF{'BASES'}{$clave}{'TIPO'} eq "\$")
        { $CONFIG->{$clave}=$valor;
@@ -66,25 +88,8 @@ sub LeeFichConf(\%\%$)
        };
        next LOO;
      };
-     if (defined($PARSECONF{'CLAVES'}{$clave}))
-     { $MODO=$clave;
-       $VALMODO=$valor;
-       next LOO;
-     };
-     if ($MODO && ($VALMODO ne "") && defined($PARSECONF{'SUBBASES'}{$MODO}{$clave}))
-     { if ($PARSECONF{'SUBBASES'}{$MODO}{$clave}{'TIPO'} eq "\$")
-       { $CONFIG->{$MODO}{$VALMODO}{$clave}=$valor;
-       } else
-       { push (@{$CONFIG->{$MODO}{$VALMODO}{$clave}},$valor);
-       };
-       next LOO;
-     };
-     if ($clave =~ m/^FIN$/)
-     { $MODO="";
-       $VALMODO="";
-       next LOO;
-     };
-     printLOG(%FLvoid,"CONF: ($fichconf:$.) Clave: $clave desconocida en $linea");
+     printLOG(%FLvoid,"CONF: ($fichconf:$.) Clave: $clave desconocida en ",
+                      "$linea");
     }; # LOO
   };
   close HANDIN;
@@ -109,7 +114,8 @@ sub GenConfParser(\%)
       $nombre=uc($2);
 
       if ($nombre =~ m#^(FIN)$# )
-      { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Configuracion de parser contiene FIN en BASE");
+      { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Configuracion de parser ",
+                         "contiene FIN en BASE");
         next;
       };
 
@@ -126,12 +132,14 @@ sub GenConfParser(\%)
       next unless ($clave);
 
       if ($clave =~ m#^(FIN)$# )
-      { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Configuracion de parser contiene una SUBCLAVE llamada FIN");
+      { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Configuracion de parser",
+                         " contiene una SUBCLAVE llamada FIN");
         next;
       };
 
       if (defined($RESUL{'BASES'}{$clave}))
-      { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Intenta definir una subclave igual que una clave base ($clave)");
+      { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Intenta definir una ",
+                        "subclave igual que una clave base ($clave). Omitida.");
         next;
       };
 
@@ -144,17 +152,15 @@ sub GenConfParser(\%)
         $nombre=uc($2);
 
         if ($nombre =~ m#^(FIN)$# )
-        { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Configuracion de parser contiene FIN como SUBCLAVE de $clave");
-          next;
-        };
-
-        if (defined($RESUL{'BASES'}{$nombre}))
-        { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Intenta definir una subclave igual que una clave base ($nombre)");
+        { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Configuracion de parser",
+                           " contiene FIN como SUBCLAVE de $clave. Omitida.");
           next;
         };
 
         if (defined($RESUL{'CLAVES'}{$nombre}))
-        { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Intenta definir una subclave igual que una clave base ($nombre)");
+        { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Intenta definir una ",
+                           " subclave igual que una clave base ($nombre).",
+                           " Omitida.");
           next;
         };
 
