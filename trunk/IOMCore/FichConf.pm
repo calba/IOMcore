@@ -131,7 +131,7 @@ sub GenConfParser(\%)
       };
 
       if (defined($RESUL{'BASES'}{$clave}))
-      { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Intenta definir una subclave igual que una clave base");
+      { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Intenta definir una subclave igual que una clave base ($clave)");
         next;
       };
 
@@ -149,12 +149,12 @@ sub GenConfParser(\%)
         };
 
         if (defined($RESUL{'BASES'}{$nombre}))
-        { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Intenta definir una subclave igual que una clave base");
+        { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Intenta definir una subclave igual que una clave base ($nombre)");
           next;
         };
 
         if (defined($RESUL{'CLAVES'}{$nombre}))
-        { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Intenta definir una subclave igual que una clave base");
+        { printLOG(%FLvoid,"IOMCore::FichConf: ORROR: Intenta definir una subclave igual que una clave base ($nombre)");
           next;
         };
 
