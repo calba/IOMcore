@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-#$Id: fichConfTool.pl,v 1.3 2003-02-10 17:28:16 calba Exp $
+#$Id: fichConfTool.pl,v 1.4 2003-03-18 17:43:46 calba Exp $
 
 use strict;
 use diagnostics;
@@ -20,6 +20,8 @@ sub VuelcaModulo($$$\%);
 
 my (%CONFIG,%ConfParser,%ConfDatos,$fichconf);
 
+%CONFIG= ( 'SEPARADOR'=>" ",);
+
 my @Opciones=( 'PARSERCONF|cf=s',
                'PARSERMOD|cm=s',
                'FICHSAL|o=s',
@@ -28,6 +30,7 @@ my @Opciones=( 'PARSERCONF|cf=s',
                'GCONFIDATOSPM|xp=s',
                'GCONFIDATOSST|xs=s',
                'ENTORNO|e!',
+               'SEPARADOR|s=s',
                'h|?' => \&Ayuda
               );
 
@@ -94,10 +97,16 @@ foreach $fichconf (@ARGV)
 if (defined($CONFIG{'ENTORNO'}))
 { my ($clave,@claves);
 
-  @claves=grep { !(ref($ConfDatos{$_})); } (keys %ConfDatos);
+  @claves=grep { !(ref($ConfDatos{$_})) || 
+                  (ref($ConfDatos{$_}) eq "ARRAY"); } (keys %ConfDatos);
 
   if (@claves)
-  { map { print "$_=\"$ConfDatos{$_}\"\n"; } (@claves);
+  { map { if (ref($ConfDatos{$_}))
+          { print "$_=\"".join($CONFIG{'SEPARADOR'},@{$ConfDatos{$_}})."\"\n";
+          } else
+          { print "$_=\"$ConfDatos{$_}\"\n"; 
+          }
+        } (@claves);
     print "export ","@claves ","\n";
   };
   exit (0);
@@ -145,7 +154,7 @@ sub Ayuda($$)
 fichConfTool.pl: Herramienta auxiliar para manejo de ficheros de configuracion
 
 Uso: 
-fichConfTool.pl [-h][-?] {-cf sintaxis.cfg | -cm sintaxis.pm} { -pp modulossint.pm | -ps modulosint.pl | -xp datosconf.pm | -xs datosconf.pl | -e } [-o fichsalida] ficheroconf.cfg ...
+fichConfTool.pl [-h][-?] {-cf sintaxis.cfg | -cm sintaxis.pm} { -pp modulossint.pm | -ps modulosint.pl | -xp datosconf.pm | -xs datosconf.pl | -e [-s sep]} [-o fichsalida] ficheroconf.cfg ...
 
 -h Esta pantalla
 -? Esta pantalla
@@ -155,8 +164,10 @@ fichConfTool.pl [-h][-?] {-cf sintaxis.cfg | -cm sintaxis.pm} { -pp modulossint.
 -ps nombrehash Genera un fichero con un hash susceptible de require o C&P
 -xp datosconf.pm Genera un modulo perl con los datos de configuracion real
 -xs nombrehash Genera un fichero perl para require o C&P con la configuracion
--e             Saca las variables base escalares por salida estandar como 
-               variables de entorno. Ideal para hacer 'eval'.
+-e             Saca las variables base escalares y arrays por salida estandar
+               como variables de entorno. Ideal para hacer 'eval'.
+-s separador Separador de los campos que formarn los arrays que salen con -e
+            Por defecto: espacio
 -o fichsalida Nombre del fichero de salida. Por defecto: salida estándar.
 
 FIN
