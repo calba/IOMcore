@@ -7,15 +7,12 @@ BEGIN {
 use Exporter   ();
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
 # if using RCS/CVS, this may be preferred
-$VERSION = do { my @r = (q$Revision: 1.2 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+$VERSION = do { my @r = (q$Revision: 1.3 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA         = qw(Exporter);
-@EXPORT      = qw(&LeeFestivos &LeeFestivos &Dias2FechaDC &FechaDMY2Dias 
+@EXPORT_OK = @EXPORT = qw(&LeeFestivos &Dias2FechaDC &FechaDMY2Dias 
                   &FechaBD2Dias &Dias2FechaYMD &Dias2FechaDMY &Dias2DiaSem
-                  Dias2Time Time2Dias);
+                  Dias2Time Time2Dias Dias2NumDiaSem);
 # as well as any optionally exported functions
-@EXPORT_OK   = qw(&LeeFestivos &LeeFestivos &Dias2FechaDC &FechaDMY2Dias 
-                  &FechaBD2Dias &Dias2FechaYMD &Dias2FechaDMY &Dias2DiaSem
-                  Dias2Time Time2Dias);
 }
 
 use Date::Calc qw( Date_to_Days Today Add_Delta_YMD Date_to_Text Add_Delta_Days Day_of_Week check_date );
@@ -26,10 +23,12 @@ my @DiasSem=qw( - L M X J V S D );
 sub LeeFestivos($)
 { my $fichconf=shift;
   my (%resul,@resul,$linea);
+  
+  @resul=();
 
   open(HANDIN,$fichconf) || do
   { print STDERR "Error al abrir: $fichconf: $!";
-    return undef;
+    return @resul;
   };
 
   while(defined($linea=<HANDIN>))
@@ -55,7 +54,6 @@ sub LeeFestivos($)
 
 };
 
-##FUNCION Dias2FechaDC($dias)
 sub Dias2FechaDMY($;$)
 { my $dias=shift;
   my $sep=shift||"/";
@@ -65,7 +63,6 @@ sub Dias2FechaDMY($;$)
   return sprintf("%02d%s%02d%s%04d",$d,$sep,$m,$sep,$y);
 };
 
-##FUNCION Dias2FechaDC($dias)
 sub Dias2FechaYMD($;$)
 { my $dias=shift;
   my $sep=shift||"/";
@@ -109,6 +106,12 @@ sub Dias2DiaSem($)
 { my $dias=shift;
 
   return $DiasSem[Day_of_Week(Dias2FechaDC($dias))];
+};
+
+sub Dias2NumDiaSem($)
+{ my $dias=shift;
+
+  return Day_of_Week(Dias2FechaDC($dias));
 };
 
 sub Dias2Time($)
