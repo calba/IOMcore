@@ -9,8 +9,7 @@ use Exporter;
 $VERSION = 1.00;              # Or higher
 @ISA = qw(Exporter);
 
-@EXPORT      = qw( Include );
-@EXPORT_OK   = qw( Include );
+@EXPORT      = @EXPORT_OK   = qw( IncludeC Include );
 %EXPORT_TAGS = ( );
 
 ##########################################################################
@@ -19,20 +18,25 @@ use IOMCore::FichLog;
 
 
 sub Include($);
-
+sub IncludeC(\%$);
 
 sub Include($)
-{ my $fichero=shift;
-  my (@lineas,$resul);
+{ return IncludeC(%FLvoid,@_);
+};
+
+
+sub IncludeC(\%$)
+{ my $CONFIG=shift;
+  my $fichero=shift;
+  my (@lineas);
   local *HANDIN;
 
   open(HANDIN,$fichero) || do
-  { printLOG(%FLvoid,"IOMCore::Include: No pude abrir fichero $fichero: $!");
+  { printLOG(%$CONFIG,"IOMCore::Include: No pude abrir fichero $fichero: $!");
     return undef;
   };
 
   @lineas=<HANDIN>;
-  $resul=join
   close(HANDIN);
 
   return join("",@lineas);
@@ -56,11 +60,14 @@ Este modulo carga un fichero y lo almacena en memoria. No se hace ningun tipo de
 
 =head1 Version
 
-$Id: Include.pm,v 1.2 2003-01-30 11:01:56 calba Exp $
+$Id: Include.pm,v 1.3 2003-12-26 20:52:24 calba Exp $
 
 =head1 Cambios
 
 $Log: not supported by cvs2svn $
+Revision 1.2  2003/01/30 11:01:56  calba
+Añadida documentacion en POD
+
 
 =cut
 
