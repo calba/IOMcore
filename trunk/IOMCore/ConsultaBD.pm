@@ -9,7 +9,7 @@ use Exporter;
 $VERSION = 1.00;              # Or higher
 @ISA = qw(Exporter);
 
-@EXPORT      = @EXPORT_OK= qw(EjecutaConsultaBD ConectarBD 
+@EXPORT      = @EXPORT_OK= qw(EjecutaConsultaBD ConectarBD DesconectarBD
                               PreparaSentenciaBD EjecutaSentenciaBD
                               EjecutaSentenciaPrep EjecutaConsultaPrep );
 %EXPORT_TAGS = ( );
@@ -20,6 +20,7 @@ use DBI;
 use IOMCore::FichLog;
 
 sub ConectarBD(\%;$);
+sub DesconectarBD(\%);
 sub PreparaSentenciaBD(\%$);
 sub EjecutaSentenciaBD(\%$;@);
 sub EjecutaSentenciaPrep(\%$;@);
@@ -43,6 +44,14 @@ sub ConectarBD(\%;$)
   };
   return 0;
 } # ConectarBDD()
+
+sub DesconectarBD(\%)
+{ my $CONFIG=shift;
+  my $resul=0;
+  #Conexión a la base de datos con autocommit
+  $CONFIG->{'DBH'}->disconnect() || ($resul=$CONFIG->{'DBH'}->errstr);
+  return $resul;
+} # DesconectarBD()
 
 #PreparaSentenciaBD(%CONFIG $sentSQL )
 #Prepara una sentencia (comprueba que es correcta) y devuelve el handle de la
