@@ -39,9 +39,9 @@ sub GrabaDump($$)
   local *HANDOUT;
   my $cadenaGZ;
   
-  $cadenaGZ=($fichero=~ m#\.gz#)?"| gzip -9 > $fichero ":"$fichero";
+  $cadenaGZ=($fichero=~ m#\.gz#)?"| gzip -9 > $fichero ":">$fichero";
 
-  open(HANDOUT,"$cadenaGZ > $fichero") || do
+  open(HANDOUT,"$cadenaGZ") || do
   { print STDERR "No pude grabar el fichero $fichero: $!\n";
     return 1;
   };
@@ -62,12 +62,12 @@ sub CargaDump($)
   $VAR1={};
 
   open(HANDIN,"$cadenaGZ") || do
-  { printLOG("Error al abrir el fichero $fichero: $!\n");
+  { print STDERR "Error al abrir el fichero $fichero: $!\n";
   };
   eval(join(" ",<HANDIN>));
   close(HANDIN);
   if ($@)
-  { printLOG("Error al evaluar el contenido del fichero $fichero: $@\n");
+  { print STDERR "Error al evaluar el contenido del fichero $fichero: $@\n";
   } else
   { $datos=$VAR1;
   };
