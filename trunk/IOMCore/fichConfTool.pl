@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+#$Id: fichConfTool.pl,v 1.2 2002-11-25 13:50:56 calba Exp $
+
 use strict;
 use diagnostics;
 
@@ -137,20 +139,12 @@ fichConfTool.pl [-h][-?] {-cf sintaxis.cfg | -cm sintaxis.pm} { -pp modulossint.
 -h Esta pantalla
 -? Esta pantalla
 -cf sintaxis.cfg Sintaxis del fichero de configuracion 
--cm sintaxis.pm Sintaxis del 
--pp modulossint.pm | 
--ps modulosint.pl | 
--xp datosconf.pm | 
--xs datosconf.pl [
--o fichsalida] ficheroconf.cfg ...
- 
- 'PARSERCONF|cf=s',
- 'PARSERMOD|cm=s',
- 'FICHSAL|o=s',
- 'GCONFIPARSERPM|pp=s',
- 'GCONFIPARSERST|ps=s',
- 'GCONFIDATOSPM|xp=s',
- 'GCONFIDATOSST|xs=s',
+-cm sintaxis.pm Modulo perl que contiene la sintaxis del fichero de conf.
+-pp modulossint.pm Genera un modulo perl susceptible de ser importado por cm
+-ps nombrehash Genera un fichero con un hash susceptible de require o C&P
+-xp datosconf.pm Genera un modulo perl con los datos de configuracion real
+-xs nombrehash Genera un fichero perl para require o C&P con la configuracion
+-o fichsalida Nombre del fichero de salida. Por defecto: salida estándar.
 
 FIN
   exit 1;
