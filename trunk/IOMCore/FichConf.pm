@@ -4,11 +4,11 @@ use strict;
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
-$VERSION = 1.00;              # Or higher
+$VERSION = do { my @r = (q$Revision: 1.5 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line,for MakeMaker
 @ISA = qw(Exporter);
 
 @EXPORT_OK = @EXPORT = qw(LeeFichConf ParseFich GenConfParser
-                          LeeFichConfParser);
+                          LeeFichConfParser Lista2Hash);
 
 ##########################################################################
 
@@ -16,8 +16,6 @@ use strict;
 use diagnostics;
 use FindBin qw($Bin);
 use lib "$Bin/..";
-
-use Data::Dumper;
 
 use IOMCore::FichLog;
 
@@ -217,4 +215,24 @@ sub LeeFichConfParser($)
   return %RESUL;
 };
   
+sub Lista2Hash(\%$$)
+{ my $CONFIG=shift;
+  my $claveLista=shift;
+  my $claveHash=shift;
+
+  do
+  { printLOG(%$CONFIG,"Variable $claveLista no definida o es del tipo escalar");
+    return;
+  } unless (defined($CONFIG->{$claveLista}) && 
+                                      (ref($CONFIG->{$claveLista}) eq "ARRAY"));
+
+  do
+  { printLOG(%$CONFIG,"Variable $claveHash ya en uso");
+    return;
+  } if (defined($CONFIG->{$claveHash}));
+
+  map { $CONFIG->{$claveHash}{$_}++; } (@{$CONFIG->{$claveLista}});
+};
+
+
 1;
