@@ -39,7 +39,7 @@ sub GrabaDump($$)
   local *HANDOUT;
   my $cadenaGZ;
   
-  $cadenaGZ=($fichero=~ m#\.gz#)?"| gzip -9 > $fichero ":">$fichero";
+  $cadenaGZ=($fichero=~ m#\.gz$#)?"| gzip -9 > $fichero ":">$fichero";
 
   open(HANDOUT,"$cadenaGZ") || do
   { print STDERR "No pude grabar el fichero $fichero: $!\n";
@@ -57,7 +57,7 @@ sub CargaDump($)
   local *HANDOUT;
   my $cadenaGZ;
 
-  $cadenaGZ=($fichero=~ m/\.gz/)?"gzip -cd  $fichero |":"$fichero";
+  $cadenaGZ=($fichero=~ m/\.gz$/)?"gzip -cd  $fichero |":"$fichero";
 
   $VAR1={};
 
