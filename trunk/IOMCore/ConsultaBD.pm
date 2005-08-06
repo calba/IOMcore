@@ -11,7 +11,8 @@ $VERSION = 1.00;              # Or higher
 
 @EXPORT      = @EXPORT_OK= qw(EjecutaConsultaBD ConectarBD DesconectarBD
                               PreparaSentenciaBD EjecutaSentenciaBD
-                              EjecutaSentenciaPrep EjecutaConsultaPrep );
+                              EjecutaSentenciaPrep EjecutaConsultaPrep
+                              Commit Rollback);
 %EXPORT_TAGS = ( );
 
 ##########################################################################
@@ -26,6 +27,8 @@ sub EjecutaSentenciaBD(\%$;@);
 sub EjecutaSentenciaPrep(\%$;@);
 sub EjecutaConsultaBD(\%$;@);
 sub EjecutaConsultaPrep(\%$;@);
+sub Commit(\%);
+sub Rollback(\%);
 
 
 sub ConectarBD(\%;$)
@@ -69,7 +72,7 @@ sub PreparaSentenciaBD(\%$)
 
   eval
   { $CONFIG->{'DBH'}->{RaiseError}=1;
-    $sql=$CONFIG->{'DBH'}->prepare($sentSQL);
+    $sql=$CONFIG->{'DBH'}->prepare_cached($sentSQL,{});
 
   };
   if ($@)
@@ -186,4 +189,42 @@ sub EjecutaConsultaPrep(\%$;@)
   return $resul;
 };
 
+sub Commit(\%)
+{ my $CONFIG=shift;
+  my $resul;
+
+  eval
+  { $CONFIG->{'DBH'}->{RaiseError}=1;
+    $resul=$CONFIG->{'DBH'}->commit();
+  };
+  if ($@)
+  { printLOG(%{$CONFIG},"Commit: Fallo commit. ",
+                        " Error: $@");
+    return undef;
+  };
+
+  return $resul;
+};
+
+1;
+  
+sub Rollback(\%)
+{ my $CONFIG=shift;
+  my $resul;
+
+  eval
+  { $CONFIG->{'DBH'}->{RaiseError}=1;
+    $resul=$CONFIG->{'DBH'}->rollback();
+  };
+  if ($@)
+  { printLOG(%{$CONFIG},"Commit: Fallo commit. ",
+                        " Error: $@");
+    return undef;
+  };
+
+  return $resul;
+};
+
+1;
+  
 1;
