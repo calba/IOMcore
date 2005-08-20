@@ -12,13 +12,15 @@ $VERSION = 1.00;              # Or higher
 @EXPORT      = @EXPORT_OK= qw(EjecutaConsultaBD ConectarBD DesconectarBD
                               PreparaSentenciaBD EjecutaSentenciaBD
                               EjecutaSentenciaPrep EjecutaConsultaPrep
-                              Commit Rollback);
+                              ComienzaTransaccion Commit Rollback);
 %EXPORT_TAGS = ( );
 
 ##########################################################################
 
 use DBI;
 use IOMCore::FichLog;
+use Data::Dumper;
+
 
 sub ConectarBD(\%;$);
 sub DesconectarBD(\%);
@@ -27,6 +29,7 @@ sub EjecutaSentenciaBD(\%$;@);
 sub EjecutaSentenciaPrep(\%$;@);
 sub EjecutaConsultaBD(\%$;@);
 sub EjecutaConsultaPrep(\%$;@);
+sub ComienzaTransaccion(\%);
 sub Commit(\%);
 sub Rollback(\%);
 
@@ -98,9 +101,9 @@ sub EjecutaSentenciaBD(\%$;@)
   my $sentSQL=shift;
   my @resto=@_;
 
-  my ($sentprep,$sql,$resul);
+  my ($sentprep);
 
-  $sentprep=PreparaSentenciaBD(%$CONFIG,$sql);
+  $sentprep=PreparaSentenciaBD(%$CONFIG,$sentSQL);
 
   return undef unless defined($sentprep);
 
@@ -206,8 +209,6 @@ sub Commit(\%)
   return $resul;
 };
 
-1;
-  
 sub Rollback(\%)
 { my $CONFIG=shift;
   my $resul;
@@ -217,7 +218,7 @@ sub Rollback(\%)
     $resul=$CONFIG->{'DBH'}->rollback();
   };
   if ($@)
-  { printLOG(%{$CONFIG},"Commit: Fallo commit. ",
+  { printLOG(%{$CONFIG},"Rollback: Fallo rollback. ",
                         " Error: $@");
     return undef;
   };
@@ -225,6 +226,21 @@ sub Rollback(\%)
   return $resul;
 };
 
-1;
-  
+sub ComienzaTransaccion(\%)
+{ my $CONFIG=shift;
+  my $resul;
+
+  eval
+  { $CONFIG->{'DBH'}->{RaiseError}=1;
+    $resul=$CONFIG->{'DBH'}->begin_work();
+  };
+  if ($@)
+  { printLOG(%{$CONFIG},"ComienzaTransaccion: Fallo al comenzar la ",
+                        "transaccion. Error: $@");
+    return undef;
+  };
+
+  return $resul;
+};
+
 1;
