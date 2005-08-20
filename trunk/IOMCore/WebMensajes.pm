@@ -7,16 +7,21 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
 $VERSION = 1.00;              # Or higher
-#$VERSION = do { my @r = (q$Revision: 1.2 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+#$VERSION = do { my @r = (q$Revision: 1.3 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA = qw(Exporter);
 
-@EXPORT      = @EXPORT_OK   = qw( Mensaje PonMensajes ListaPopUp);
+@EXPORT      = @EXPORT_OK   = qw( Mensaje PonMensajes ListaPopUp ComponURL);
 %EXPORT_TAGS = ( );
 
 ##########################################################################
 
 use IOMCore::FichLog;
 use CGI qw/:standard/;
+
+sub ComponURL(\%;$);
+sub ListaPopUp(\%$$$$);
+sub Mensaje(\%;@);
+sub PonMensajes(\%);
 
 sub Mensaje(\%;@)
 { my $CONFIG=shift;
@@ -66,6 +71,13 @@ sub ListaPopUp(\%$$$$)
                     -override=>1);
 };
 
+sub ComponURL($;$)
+{ my $url=shift;
+
+  return join('/',$url,@_);
+};
+
+
 
 1;
 
@@ -82,11 +94,14 @@ IOMCore::
 
 =head1 Version
 
-$Id: WebMensajes.pm,v 1.2 2004-12-10 09:15:28 calba Exp $
+$Id: WebMensajes.pm,v 1.3 2005-08-20 21:13:48 calba Exp $
 
 =head1 Cambios
 
 $Log: not supported by cvs2svn $
+Revision 1.2  2004/12/10 09:15:28  calba
+Añadidas nuevas funciones
+
 Revision 1.1  2003/07/10 08:40:29  calba
 Carga inicial
 
