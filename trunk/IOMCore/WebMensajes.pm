@@ -7,7 +7,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
 $VERSION = 1.00;              # Or higher
-#$VERSION = do { my @r = (q$Revision: 1.3 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+#$VERSION = do { my @r = (q$Revision: 1.4 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA = qw(Exporter);
 
 @EXPORT      = @EXPORT_OK   = qw( Mensaje PonMensajes ListaPopUp ComponURL);
@@ -18,7 +18,7 @@ $VERSION = 1.00;              # Or higher
 use IOMCore::FichLog;
 use CGI qw/:standard/;
 
-sub ComponURL(\%;$);
+sub ComponURL($;$);
 sub ListaPopUp(\%$$$$);
 sub Mensaje(\%;@);
 sub PonMensajes(\%);
@@ -94,11 +94,15 @@ IOMCore::
 
 =head1 Version
 
-$Id: WebMensajes.pm,v 1.3 2005-08-20 21:13:48 calba Exp $
+$Id: WebMensajes.pm,v 1.4 2005-08-20 21:48:53 calba Exp $
 
 =head1 Cambios
 
 $Log: not supported by cvs2svn $
+Revision 1.3  2005/08/20 21:13:48  calba
+- AÃ±adida funcion ComponURL para aplicaciones tipo REST (en las que la URL tiene mucho significado)
+- Prototipadas las funciones
+
 Revision 1.2  2004/12/10 09:15:28  calba
 Añadidas nuevas funciones
 
