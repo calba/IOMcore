@@ -7,12 +7,12 @@ BEGIN {
 use Exporter   ();
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
 # if using RCS/CVS, this may be preferred
-$VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+$VERSION = do { my @r = (q$Revision: 1.7 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA         = qw(Exporter);
 @EXPORT_OK = @EXPORT = qw(&LeeFestivos &Dias2FechaDC &FechaDMY2Dias 
                   &FechaBD2Dias &Dias2FechaYMD &Dias2FechaDMY &Dias2DiaSem
                   Dias2Time Time2Dias Dias2NumDiaSem Time2FechaHora
-                  Hoy2Dias );
+                  Hoy2Dias PubDate2Time);
 # as well as any optionally exported functions
 }
 
@@ -149,5 +149,45 @@ sub Hoy2Dias()
 { return Time2Dias(time());
 };
 
+sub PubDate2Time($)
+{ my $pubdate=shift;
+  my ($dia,$mes,$year,$hora,$min,$seg,$TZ);
+
+  my %meses= ( 'jan' =>1,
+               'feb' =>2,
+               'mar' =>3,
+               'apr' =>4,
+               'may' =>5,
+               'jun' =>6,
+               'jul' =>7,
+               'aug' =>8,
+               'sep' =>9,
+               'oct' =>10,
+               'nov' =>11,
+               'dec' =>12);
+ 
+#<pubDate>Fri, 22 Apr 2005 16:22:45 GMT</pubDate>
+  if ($pubdate =~ m#(:?.*),\s+
+                    (\d{1,2})\s+
+                    (\w+)\s+
+                    (\d{4})\s+
+                    (\d{2}):(\d{2}):(\d{2})\s+
+                    (\w+)#ix)
+  { my ($dia,$mes,$year,$hora,$min,$seg,$TZ,$nummes);
+
+    $dia=$2;
+    $mes=$3;
+    $year=$4;
+    $hora=$5;
+    $min=$6;
+    $seg=$7;
+    $TZ=$8;
+    $nummes=$meses{lc($mes)};
+
+    return timelocal($seg, $min, $hora, $dia, $nummes-1, $year-1900);
+  } else
+  { return 0;
+  };
+};
 
 1;
