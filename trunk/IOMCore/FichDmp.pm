@@ -63,6 +63,7 @@ sub CargaDump($)
 
   open(HANDIN,"$cadenaGZ") || do
   { print STDERR "Error al abrir el fichero $fichero: $!\n";
+    return $VAR1;
   };
   eval(join(" ",<HANDIN>));
   close(HANDIN);
