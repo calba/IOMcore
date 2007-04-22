@@ -7,7 +7,7 @@ BEGIN {
 use Exporter   ();
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
 # if using RCS/CVS, this may be preferred
-$VERSION = do { my @r = (q$Revision: 1.8 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+$VERSION = do { my @r = (q$Revision: 1.9 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA         = qw(Exporter);
 @EXPORT_OK = @EXPORT = qw(&LeeFestivos &Dias2FechaDC &FechaDMY2Dias 
                   &FechaBD2Dias &Dias2FechaYMD &Dias2FechaDMY &Dias2DiaSem
@@ -185,6 +185,13 @@ sub PubDate2Time($)
     $nummes=$meses{lc($mes)};
 
     return timelocal($seg, $min, $hora, $dia, $nummes-1, $year-1900);
+  } elsif ($pubdate =~ m#(\d{4})-(\d{1,2})-(\d{1,2})#)
+  { my ($dia,$mes,$year);
+
+    $dia=$3;
+    $mes=$2;
+    $year=$1;
+    return timelocal(0, 0, 0, $dia, $mes-1, $year-1900);
   } else
   { return 0;
   };
