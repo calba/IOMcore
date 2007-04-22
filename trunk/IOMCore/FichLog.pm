@@ -32,13 +32,14 @@ sub printLOG(\%@)
   $cadena=join("",@_);
   $linea = scalar(localtime)." [$$] $cadena\n";
 
-  *HANDERR = *STDERR;
   if (defined($CONFIG->{'LOGFILE'}))
   { $flag=1;
     open(HANDERR,">>".$CONFIG->{'LOGFILE'}) || do
     { *HANDERR = *STDERR;
       $flag=0;
     };
+  } else
+  { *HANDERR = *STDERR;
   };
   print HANDERR $linea;
   close HANDERR if ($flag);
