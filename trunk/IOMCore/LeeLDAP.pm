@@ -7,7 +7,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
 $VERSION = 1.00;              # Or higher
-#$VERSION = do { my @r = (q$Revision: 1.3 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+#$VERSION = do { my @r = (q$Revision: 1.4 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA = qw(Exporter);
 
 @EXPORT      = @EXPORT_OK =  qw( SacaEntradaLDAP SacaEntradaLDAPDN
@@ -64,9 +64,9 @@ sub SacaEntradaLDAP(\%$$;@)
   { my (%aux,$attr,$claveind);
     my $huboind=0;
 
-
     %aux=();
-  
+    #Extrae el DN y lo añade siempre
+    $aux{'dn'}{$entry->dn()}++;
     foreach $attr ($entry->attributes)
     { map { $aux{$attr}{$_}++; }  ($entry->get_value($attr));
       if ($attr eq $campoindice)
@@ -378,11 +378,14 @@ $VAR1 = {
 
 =head1 Version
 
-$Id: LeeLDAP.pm,v 1.3 2004-12-10 09:15:28 calba Exp $
+$Id: LeeLDAP.pm,v 1.4 2008-03-17 06:48:52 calba Exp $
 
 =head1 Cambios
 
 $Log: not supported by cvs2svn $
+Revision 1.3  2004/12/10 09:15:28  calba
+Añadidas nuevas funciones
+
 Revision 1.2  2003/07/09 18:40:12  calba
 - Añadida función ValorLDAP:  a partir de una entrada saca el contenido de una variable. Si es una lista, hace un join con un separador que se pasa como parametro.
 
