@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>IOMcore</name>
-	<comment></comment>
+	<name>IOMCore</name>
+	<comment>Funciones de uso general en PERL</comment>
 	<projects>
 	</projects>
 	<buildSpec>
