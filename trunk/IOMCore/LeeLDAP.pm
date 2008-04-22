@@ -7,7 +7,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
 $VERSION = 1.00;              # Or higher
-#$VERSION = do { my @r = (q$Revision: 1.4 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+#$VERSION = do { my @r = (q$Revision: 1.5 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA = qw(Exporter);
 
 @EXPORT      = @EXPORT_OK =  qw( SacaEntradaLDAP SacaEntradaLDAPDN
@@ -23,7 +23,7 @@ use Net::LDAP;
 use IOMCore::FichLog;
 use Data::Dumper;
 
-sub SacaEntradaLDAP(\%$$;@);
+sub SacaEntradaLDAP(\%$;$@);
 sub SacaEntradaLDAPDN(\%$);
 sub ValorLDAP(\%$;$);
 sub ConectaServidorLDAP(\%);
@@ -33,10 +33,10 @@ sub ModificaEntradaLDAP(\%$\@);
 sub CierraConexionLDAP(\%);
 sub AddOrModify(\%$$);
 
-sub SacaEntradaLDAP(\%$$;@)
+sub SacaEntradaLDAP(\%$;$@)
 { my $CONFIG=shift;
   my $filtro=shift;
-  my $campoindice=shift;
+  my $campoindice=shift||"dn";
   my @param=@_;
   my $contnoind=0;
 
@@ -378,11 +378,14 @@ $VAR1 = {
 
 =head1 Version
 
-$Id: LeeLDAP.pm,v 1.4 2008-03-17 06:48:52 calba Exp $
+$Id: LeeLDAP.pm,v 1.5 2008-04-22 10:27:28 calba Exp $
 
 =head1 Cambios
 
 $Log: not supported by cvs2svn $
+Revision 1.4  2008/03/17 06:48:52  calba
+Modificado BuscaLDAP para que en el resultado a√±ada  a cada entrada su propio DN.
+
 Revision 1.3  2004/12/10 09:15:28  calba
 AÒadidas nuevas funciones
 
