@@ -6,8 +6,8 @@ use diagnostics;
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
-$VERSION = 1.00;              # Or higher
-#$VERSION = do { my @r = (q$Revision: 1.5 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+
+$VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA = qw(Exporter);
 
 @EXPORT      = @EXPORT_OK =  qw( SacaEntradaLDAP SacaEntradaLDAPDN
@@ -378,11 +378,14 @@ $VAR1 = {
 
 =head1 Version
 
-$Id: LeeLDAP.pm,v 1.5 2008-04-22 10:27:28 calba Exp $
+$Id: LeeLDAP.pm,v 1.6 2008-05-02 08:01:10 calba Exp $
 
 =head1 Cambios
 
 $Log: not supported by cvs2svn $
+Revision 1.5  2008/04/22 10:27:28  calba
+En SacaEntradaLDAP, el parametro campoindice, que marca la clave usada para el hash, pasa a ser opcional usándose por defecto "dn".
+
 Revision 1.4  2008/03/17 06:48:52  calba
 Modificado BuscaLDAP para que en el resultado añada  a cada entrada su propio DN.
 
