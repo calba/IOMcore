@@ -6,7 +6,7 @@ use diagnostics;
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
-$VERSION = 1.00;              # Or higher
+$VERSION = do { my @r = (q$Revision: 1.7 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker$VERSION = 1.00;              # Or higher
 @ISA = qw(Exporter);
 
 @EXPORT      = @EXPORT_OK = qw( Include IncludeC Append AppendC );
@@ -82,11 +82,14 @@ Este modulo carga un fichero y lo almacena en memoria. No se hace ningun tipo de
 
 =head1 Version
 
-$Id: Include.pm,v 1.6 2005-01-25 17:03:57 calba Exp $
+$Id: Include.pm,v 1.7 2008-05-06 22:48:33 calba Exp $
 
 =head1 Cambios
 
 $Log: not supported by cvs2svn $
+Revision 1.6  2005/01/25 17:03:57  calba
+- Añadidas las funciones Append y AppendC para añadir contenido a ficheros
+
 Revision 1.5  2004/12/28 08:45:43  calba
 - Corregida una linea del cambio anterior que provocaba un warning
 

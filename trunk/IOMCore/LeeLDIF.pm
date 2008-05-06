@@ -6,7 +6,7 @@ use diagnostics;
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
-$VERSION = 1.00;              # Or higher
+$VERSION = do { my @r = (q$Revision: 1.2 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA = qw(Exporter);
 
 @EXPORT      = qw( ldif2hash );
