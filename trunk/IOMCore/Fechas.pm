@@ -7,12 +7,12 @@ BEGIN {
 use Exporter   ();
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
 # if using RCS/CVS, this may be preferred
-$VERSION = do { my @r = (q$Revision: 1.12 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+$VERSION = do { my @r = (q$Revision: 1.13 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA         = qw(Exporter);
 @EXPORT_OK = @EXPORT = qw(&LeeFestivos &Dias2FechaDC &FechaDMY2Dias 
                   &FechaBD2Dias &Dias2FechaYMD &Dias2FechaDMY &Dias2DiaSem
                   Dias2Time Time2Dias Dias2NumDiaSem Time2FechaHora
-                  Hoy2Dias PubDate2Time Time2FechaYMD);
+                  Hoy2Dias PubDate2Time Time2FechaYMD Time2YMDHMS);
 # as well as any optionally exported functions
 }
 
@@ -143,6 +143,17 @@ sub Time2FechaHora($;$)
   ($seg, $min,$hor,$dia,$mes,$year, undef, undef, undef) = localtime($time);
   return sprintf("%02i%s%02i%s%04i %02i:%02i:%02i",
                        $dia,$sep,$mes+1,$sep,$year+1900,$hor,$min,$seg);
+};
+
+sub Time2YMDHMS($;$)
+{ my $time=shift;
+  my $sep=shift||"/";
+  my ($seg,$min,$hor,$dia,$mes,$year);
+
+  ($seg, $min,$hor,$dia,$mes,$year, undef, undef, undef) = localtime($time);
+  return sprintf("%04i%s%02i%s%02i%s%02i%s%02i%s%02i",
+                       $year+1900,$sep,$dia,$sep,$mes+1,$sep,
+                                                      $hor,$sep,$min,$sep,$seg);
 };
 
 sub Hoy2Dias()
