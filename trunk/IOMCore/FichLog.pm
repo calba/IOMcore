@@ -6,11 +6,10 @@ use diagnostics;
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
-$VERSION = do { my @r = (q$Revision: 1.4 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+$VERSION = do { my @r = (q$Revision: 1.5 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA = qw(Exporter);
 
-@EXPORT      = qw( printLOG printLOGmask printLOGlevel %FLvoid );
-@EXPORT_OK   = qw( printLOG printLOGmask printLOGlevel %FLvoid );
+@EXPORT_OK = @EXPORT = qw( printLOG printLOGmask printLOGlevel %FLvoid TRAZA );
 %EXPORT_TAGS = ( );
 
 ##########################################################################
@@ -21,6 +20,7 @@ use vars qw( %FLvoid );
 sub printLOG(\%@);
 sub printLOGmask(\%$@);
 sub printLOGlevel(\%$@);
+sub TRAZA(\%@);
 
 sub printLOG(\%@)
 { my $CONFIG=shift;
@@ -43,6 +43,13 @@ sub printLOG(\%@)
   };
   print HANDERR $linea;
   close HANDERR if ($flag);
+};
+
+#Alias de printLOG (hecho para distinguir de los printLOG y para facilitar la 
+#eliminacion
+sub TRAZA(\%@)
+{ my $CONFIG=shift;
+  return printLOG(%$CONFIG,@_);
 };
 
 sub printLOGlevel(\%$@)
