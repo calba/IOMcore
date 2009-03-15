@@ -7,7 +7,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
 
-$VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+$VERSION = do { my @r = (q$Revision: 1.7 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA = qw(Exporter);
 
 @EXPORT      = @EXPORT_OK =  qw( SacaEntradaLDAP SacaEntradaLDAPDN
@@ -243,11 +243,9 @@ sub ModificaEntradaLDAP(\%$\@)
   }
   @auxi=@{$cambios};
 
-printLOG(%$CONFIG,"ModificaEntradaLDAP: Antes de modify", Dumper($cambios));
   $mesg = $ldap->modify( $dn,
                       'changes' => [ @auxi ],
                     );
-printLOG(%$CONFIG,"ModificaEntradaLDAP: Despues de modify", Dumper($mesg));
 
   if($mesg->code)
   { #Mensaje de error
@@ -378,11 +376,14 @@ $VAR1 = {
 
 =head1 Version
 
-$Id: LeeLDAP.pm,v 1.6 2008-05-02 08:01:10 calba Exp $
+$Id: LeeLDAP.pm,v 1.7 2009-03-15 15:54:31 calba Exp $
 
 =head1 Cambios
 
 $Log: not supported by cvs2svn $
+Revision 1.6  2008/05/02 08:01:10  calba
+Modificado para que emplee la versión provista por CVS
+
 Revision 1.5  2008/04/22 10:27:28  calba
 En SacaEntradaLDAP, el parametro campoindice, que marca la clave usada para el hash, pasa a ser opcional usándose por defecto "dn".
 
