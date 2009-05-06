@@ -4,10 +4,10 @@ use strict;
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
-$VERSION = do { my @r = (q$Revision: 1.5 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line,for MakeMaker
+$VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line,for MakeMaker
 @ISA = qw(Exporter);
 
-@EXPORT_OK = @EXPORT = qw(LeeFichConf ParseFich GenConfParser
+@EXPORT_OK = @EXPORT = qw(LeeFichConf ParseFich GenConfParser ConfParser
                           LeeFichConfParser Lista2Hash);
 
 ##########################################################################
@@ -17,6 +17,8 @@ use diagnostics;
 use FindBin qw($Bin);
 use lib "$Bin/..";
 
+use Data::Dumper;
+
 use IOMCore::FichLog;
 
 sub LeeFichConfParser($);
@@ -24,6 +26,7 @@ sub GenConfParser(\%);
 sub EliminaDuplisArray(\@);
 sub HazLimpieza(\%);
 sub LeeFichConf(\%\%$);
+sub ConfParser(\%$);
 
 sub LeeFichConf(\%\%$)
 { my $CONFIG=shift;
@@ -234,5 +237,22 @@ sub Lista2Hash(\%$$)
   map { $CONFIG->{$claveHash}{$_}++; } (@{$CONFIG->{$claveLista}});
 };
 
+sub ConfParser(\%$)
+{ my $CONFIG=shift;
+  my $gramaBase=shift;
+
+  my $resul=sub
+  { my ($nada,$fichconf)=@_;
+    our %ConfParser;
+
+    #Carga de la gramática
+    require $gramaBase;
+
+    #Lectura de fichero de configuracion
+    LeeFichConf(%$CONFIG,%ConfParser,$fichconf);
+  };
+  
+  return $resul;  
+}
 
 1;
