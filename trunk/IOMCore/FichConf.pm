@@ -4,7 +4,7 @@ use strict;
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
-$VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line,for MakeMaker
+$VERSION = do { my @r = (q$Revision: 1.7 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line,for MakeMaker
 @ISA = qw(Exporter);
 
 @EXPORT_OK = @EXPORT = qw(LeeFichConf ParseFich GenConfParser ConfParser
@@ -206,6 +206,9 @@ sub HazLimpieza(\%)
   };
 };
 
+#Lee el fichero de descripción de la gramática del fichero (que es un fichero de
+#configuración en sí mismo) y devuelve la variable que permite la interpretación
+#del fichero de configuración 
 sub LeeFichConfParser($)
 { my $fichero=shift;
   my %RESUL=();
@@ -237,6 +240,20 @@ sub Lista2Hash(\%$$)
   map { $CONFIG->{$claveHash}{$_}++; } (@{$CONFIG->{$claveLista}});
 };
 
+
+#Devuelve con una closure de una función de lectura de fichero de configuración
+#susceptible de ser usada como callback por GetOptions.
+#Uso: 
+#Como opción en GetOptions:
+#  my @OPTIONS = ( ... 
+#                  'c=s' => ConfParser(%CONFIG,$gramBASE),
+#                  ...
+#              );
+#...
+#GetOptions(\%CONFIG,@OPTIONS);
+#grambase es la ubicación del fichero que contiene la descripción YA ADAPTADA 
+#del fichero de configuración
+#CONFIG es la variable que va a almacenar la configuración leída del fichero
 sub ConfParser(\%$)
 { my $CONFIG=shift;
   my $gramaBase=shift;
@@ -245,10 +262,10 @@ sub ConfParser(\%$)
   { my ($nada,$fichconf)=@_;
     our %ConfParser;
 
-    #Carga de la gramÃ¡tica
+    #Carga de la gramática
     require $gramaBase;
 
-    #Lectura de fichero de configuracion
+    #Lectura de fichero de configuración
     LeeFichConf(%$CONFIG,%ConfParser,$fichconf);
   };
   
