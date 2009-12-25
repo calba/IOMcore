@@ -7,12 +7,14 @@ BEGIN {
 use Exporter   ();
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
 # if using RCS/CVS, this may be preferred
-$VERSION = do { my @r = (q$Revision: 1.13 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+$VERSION = do { my @r = (q$Revision: 1.14 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA         = qw(Exporter);
 @EXPORT_OK = @EXPORT = qw(&LeeFestivos &Dias2FechaDC &FechaDMY2Dias 
                   &FechaBD2Dias &Dias2FechaYMD &Dias2FechaDMY &Dias2DiaSem
                   Dias2Time Time2Dias Dias2NumDiaSem Time2FechaHora
-                  Hoy2Dias PubDate2Time Time2FechaYMD Time2YMDHMS);
+                  Hoy2Dias PubDate2Time Time2FechaYMD Time2YMDHMS 
+                  TimestampMy2Time
+                  );
 # as well as any optionally exported functions
 }
 
@@ -188,7 +190,7 @@ sub PubDate2Time($)
                'november' =>11,
                'dec' =>12,
                'december' =>12,
-               #En español
+               #En espaÃ±ol
                'ene' =>1,
                'abr' =>4,
                'ago' =>8,
@@ -266,6 +268,18 @@ sub Time2FechaYMD($;$)
 
   (undef, undef, undef, $dia, $mes, $year, undef, undef, undef) = localtime($time);
   return sprintf("%04d%s%02d%s%02d",$year+1900,$sep,$mes+1,$sep,$dia);
+};
+
+sub TimestampMy2Time($)
+{ my $tstamp=shift;
+
+  my ($anno,$mes,$dia,$hora,$min,$seg);
+  if ($tstamp =~ m/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/)
+  { ($anno,$mes,$dia,$hora,$min,$seg)=($1,$2,$3,$4,$5,$6);
+  } else
+  { ($anno,$mes,$dia,$hora,$min,$seg)=(0,0,0,0,0,0);
+  };
+  return timelocal($seg,$min,$hora, $dia, $mes-1, $anno-1900);
 };
 
 1;
