@@ -38,7 +38,7 @@ sub Rollback(\%);
 sub ConectarBD(\%;$)
 { my $CONFIG=shift;
   my $autocommit=shift||0;
-  #Conexión a la base de datos con autocommit
+  #ConexiÃ³n a la base de datos con autocommit
   $CONFIG->{'DBH'} = DBI->connect($CONFIG->{'BD_DSN'},
                                   $CONFIG->{'BD_USER'},
                                   $CONFIG->{'BD_PASSWORD'},
@@ -55,7 +55,7 @@ sub ConectarBD(\%;$)
 sub DesconectarBD(\%)
 { my $CONFIG=shift;
   my $resul=0;
-  #Conexión a la base de datos con autocommit
+  #ConexiÃ³n a la base de datos con autocommit
   $CONFIG->{'DBH'}->disconnect() || ($resul=$CONFIG->{'DBH'}->errstr);
   return $resul;
 } # DesconectarBD()
@@ -64,15 +64,17 @@ sub DesconectarBD(\%)
 #Prepara una sentencia (comprueba que es correcta) y devuelve el handle de la
 #sentencia o undef si hubo problemas.
 #Si hubo problemas deja el mensaje en el LOG.
-#La ventaja es que es una ejecución controlada
+#La ventaja es que es una ejecuciÃ³n controlada
 #Se pasa una sentencia SQL (se admiten placeholders)
-#Se ejecuta contra el Handle de BD que está en $CONFIG{'DBH'}
+#Se ejecuta contra el Handle de BD que estÃ¡ en $CONFIG{'DBH'}
 
 sub PreparaSentenciaBD(\%$)
 { my $CONFIG=shift;
   my $sentSQL=shift;
 
   my ($sql,$resul);
+
+  defined($CONFIG->{'xBD'}{$sentSQL}) && return $CONFIG->{'xBD'}{$sentSQL};
 
   eval
   { $CONFIG->{'DBH'}->{RaiseError}=1;
@@ -84,7 +86,8 @@ sub PreparaSentenciaBD(\%$)
                 " Error: $@");
     return undef;
   } else
-  { return $sql;
+  { $CONFIG->{'xBD'}{$sentSQL}=$sql;
+    return $sql;
   };
 };
 
@@ -92,10 +95,10 @@ sub PreparaSentenciaBD(\%$)
 #Ejecuta una sentencia (la prepara y la ejecuta) y devuelve el resultado de la
 #sentencia o undef si hubo problemas.
 #Si hubo problemas deja el mensaje en el LOG.
-#La ventaja es que es una ejecución controlada
+#La ventaja es que es una ejecuciÃ³n controlada
 #Se pasa una sentencia SQL (se admiten placeholders)
 #Se pasan los parametros que ocupan los "placeholders"
-#Se ejecuta contra el Handle de BD que está en $CONFIG{'DBH'}
+#Se ejecuta contra el Handle de BD que estÃ¡ en $CONFIG{'DBH'}
 
 sub EjecutaSentenciaBD(\%$;@)
 { my $CONFIG=shift;
@@ -113,14 +116,14 @@ sub EjecutaSentenciaBD(\%$;@)
 };
 
 #EjecutaSentenciaPrep(%CONFIG $sentSQL @params)
-#Ejecuta una sentencia que ya se ha pasado por el prepare 
+#Ejecuta una sentencia que ya se ha pasado por el prepare
 #y devuelve el resultado de la
 #sentencia o undef si hubo problemas.
 #Si hubo problemas deja el mensaje en el LOG.
-#La ventaja es que es una ejecución controlada
+#La ventaja es que es una ejecuciÃ³n controlada
 #Se pasa una sentencia SQL (se admiten placeholders)
 #Se pasan los parametros que ocupan los "placeholders"
-#Se ejecuta contra el Handle de BD que está en $CONFIG{'DBH'}
+#Se ejecuta contra el Handle de BD que estÃ¡ en $CONFIG{'DBH'}
 sub EjecutaSentenciaPrep(\%$;@)
 { my $CONFIG=shift;
   my $sentprep=shift;
@@ -142,10 +145,10 @@ sub EjecutaSentenciaPrep(\%$;@)
 };
 
 #EjecutaConsultaBD(%CONFIG $sentSQL @parametros)
-#Ejecución controlada de una sentencia select .
+#EjecuciÃ³n controlada de una sentencia select .
 #Se pasa una sentencia SQL (se admiten placeholders)
 #Se pasan los parametros que ocupan los "placeholders"
-#Se ejecuta contra el Handle de BD que está en $CONFIG{'DBH'}
+#Se ejecuta contra el Handle de BD que estÃ¡ en $CONFIG{'DBH'}
 #La sentencia se ejecuta con selectall_arrayref y devuelve un array de hashes
 #Cuyas claves son los campos del select
 sub EjecutaConsultaBD(\%$;@)
@@ -164,10 +167,10 @@ sub EjecutaConsultaBD(\%$;@)
 };
 
 #EjecutaConsultaPrep(%CONFIG $sentSQL @parametros)
-#Ejecución controlada de una sentencia select ya preparada.
+#EjecuciÃ³n controlada de una sentencia select ya preparada.
 #Se pasa una sentencia SQL (se admiten placeholders)
 #Se pasan los parametros que ocupan los "placeholders"
-#Se ejecuta contra el Handle de BD que está en $CONFIG{'DBH'}
+#Se ejecuta contra el Handle de BD que estÃ¡ en $CONFIG{'DBH'}
 #La sentencia se ejecuta con selectall_arrayref y devuelve un array de hashes
 #Cuyas claves son los campos del select
 sub EjecutaConsultaPrep(\%$;@)
@@ -213,6 +216,8 @@ sub Commit(\%)
 sub Rollback(\%)
 { my $CONFIG=shift;
   my $resul;
+
+  printLOG(%$CONFIG,"Rollback!");
 
   eval
   { $CONFIG->{'DBH'}->{RaiseError}=1;
