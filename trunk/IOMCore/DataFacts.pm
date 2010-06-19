@@ -1,4 +1,4 @@
-package Catbert::DataFacts;
+package IOMCore::DataFacts;
 
 use strict;
 use warnings;
@@ -11,43 +11,38 @@ BEGIN
   # if using RCS/CVS, this may be preferred
   $VERSION = do { my @r = ( q$Revision: 1.3 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r }; # must be all one line, for MakeMaker
   @ISA = qw(Exporter);
-  @EXPORT_OK = @EXPORT = qw(
-    GetOpenFacts GetLatestClosedFacts
-    OpenFacts CloseFacts ReopenFacts
-  );
+  @EXPORT_OK = @EXPORT = qw( OpenFacts CloseFacts );
 
-  # as well as any optionally exported functions
+# ReopenFacts GetOpenFacts GetLatestClosedFacts
+# as well as any optionally exported functions
+
 }
-
-use libCatbert;
-use Catbert::Personal;
 
 use IOMCore::ConsultaBD;
 use IOMCore::FichLog;
-
-use Data::Dumper;
+use IOMCore::AuxPerl;
 
 sub OpenFact(\%$$$$$$);
 sub OpenFacts(\%$$\%$;$);
 
-sub ReopenFacts(\%$$\%$;$);
-
 sub CloseFacts(\%$$$$;$);
-
 sub CloseFactByID(\%$$$);
 
-sub GetOpenFact(\%$$$);
 sub GetWholeOpenFacts(\%$$);
 sub GetOpenFacts(\%$$);
+
+=pod
+sub ReopenFacts(\%$$\%$;$);
+sub GetOpenFact(\%$$$);
 sub GetFacts(\%$$);
 sub GetLatestClosedFacts(\%$$);
+=cut
 
 ##############################################################################
 ##############################################################################
 ##############################################################################
 
-#Abre, si ha cambiado el valor, un hecho de clave indicada a una persona.
-#Cierra el hecho anterior de esa persona y clave.
+#Abre un hecho de clave indicada a un objeto.
 sub OpenFact(\%$$$$$$)
 {
   my $CONFIG  = shift;
@@ -66,8 +61,8 @@ sub OpenFact(\%$$$$$$)
 
   if ( NotEmpty($valor) )
   {
-    EjecutaSent( %$CONFIG, $sentCreaFact, $tipoOBJ, $objID, $clave, $valor,
-      $tini, $ruser )
+    EjecutaSentenciaBD( %$CONFIG, $sentCreaFact, $tipoOBJ, $objID, $clave,
+                                    $valor, $tini, $ruser )
       || do
     {
       printLOG(
@@ -82,6 +77,9 @@ sub OpenFact(\%$$$$$$)
   return 1;
 }
 
+#Compara los hechos que se pasan como parámetro con los hechos abiertos del
+#objeto. Cierra los que hayan cambiado y abre los nuevos. Cierra los que hayan
+#desaparecido
 sub OpenFacts(\%$$\%$;$)
 {
   my $CONFIG  = shift;
@@ -91,11 +89,10 @@ sub OpenFacts(\%$$\%$;$)
   my $ruser   = shift;
   my $tevent  = shift || time();
 
-  my %CURFACTS;
+  my (%CURFACTS,@resul);
+  @resul=();
 
   %CURFACTS = GetWholeOpenFacts( %$CONFIG, $tipoOBJ, $objID );
-
-  #printLOG(%$CONFIG,Dumper($CONFIG,$tipoOBJ,$objID,$DATOS,$ruser,$tevent));
 
   #Compara los hechos abiertos ya existentes
   foreach my $clave ( keys %$DATOS )
@@ -119,8 +116,14 @@ sub OpenFacts(\%$$\%$;$)
       }
     }
     OpenFact( %$CONFIG, $tipoOBJ, $objID, $clave, $DATOS->{$clave}, $ruser,
-      $tevent );
+      $tevent ) || do
+    { printLOG( %$CONFIG, "Problemas al abrir el hecho ",
+                              "($tipoOBJ,$objID)->{$clave}=$DATOS->{$clave}" );
+      return 0;
+    };
+    push @resul,$clave;
   }
+  #Cierra los que ya no estén
   foreach my $clave ( keys %CURFACTS )
   {
     my $idfact = $CURFACTS{$clave}{'ID'};
@@ -130,35 +133,9 @@ sub OpenFacts(\%$$\%$;$)
       return 0;
     };
     delete $CURFACTS{$clave};
-  }
-}
-
-sub ReopenFacts(\%$$\%$;$)
-{
-  my $CONFIG  = shift;
-  my $tipoOBJ = shift;
-  my $objID   = shift;
-  my $DATOS   = shift;
-  my $ruser   = shift;
-  my $tevent  = shift || time();
-
-  my ( %tempfacts, %lastclosed );
-
-  %lastclosed = %{ GetLatestClosedFacts( %$CONFIG, $tipoOBJ, $objID ) };
-
-  foreach my $clave ( keys %lastclosed )
-  {
-    $tempfacts{$clave} = $lastclosed{$clave}{'VALOR'};
-  }
-  foreach my $clave ( keys %$DATOS )
-  {
-    $tempfacts{$clave} = $DATOS->{$clave};
-  }
-  foreach my $clave ( keys %tempfacts )
-  {
-    OpenFact( %$CONFIG, $tipoOBJ, $objID, $clave, $tempfacts{$clave}, $ruser,
-      $tevent );
-  }
+    push @resul,$clave;
+  };
+  return @resul;
 }
 
 #Cierra un hecho identificado por su número de hecho
@@ -176,7 +153,7 @@ sub CloseFactByID(\%$$$)
                   where ID=?
                /;
 
-  EjecutaSent( %$CONFIG, $sentSQL, $tfin, $ruser, $factid ) || do
+  EjecutaSentenciaBD( %$CONFIG, $sentSQL, $tfin, $ruser, $factid ) || do
   {
     printLOG( %$CONFIG, "Error al cerrar hecho: '$factid'. " );
     return 0;
@@ -185,7 +162,7 @@ sub CloseFactByID(\%$$$)
   return 1;
 }
 
-#Cierra todos los hechos abiertos de una persona
+#Cierra todos los hechos abiertos de un objeto
 sub CloseFacts(\%$$$$;$)
 {
   my $CONFIG  = shift;
@@ -205,43 +182,14 @@ sub CloseFacts(\%$$$$;$)
                                    and TFIN is NULL
                /;
 
-  EjecutaSent( %$CONFIG, $sentSQL, $tfin, $ruser, $tipoOBJ, $objID ) || do
+  EjecutaSentenciaBD( %$CONFIG, $sentSQL, $tfin, $ruser, $tipoOBJ, $objID )
+    || do
   {
     printLOG( %$CONFIG,
       "Error al cerrar hechos para objeto ($tipoOBJ,$objID)." );
     return 0;
   };
-
   return 1;
-}
-
-#Devuelve el hecho abierto 'clave' de una persona 'persid'
-sub GetOpenFact(\%$$$)
-{
-  my $CONFIG  = shift;
-  my $tipoOBJ = shift;
-  my $objID   = shift;
-  my $clave   = shift;
-
-  my ( %RESUL, $aux );
-
-  my $sentSQL = qq/
-                  select * from DATAFACTS where TIPOOBJ=?
-                                            and OBJ_id=?
-                                            and CLAVE=?
-                                            and TFIN is NULL
-                /;
-
-  $aux = EjecutaConsultaBD( %$CONFIG, $sentSQL, $tipoOBJ, $objID, $clave );
-
-  %RESUL = ();
-
-  if (@$aux)
-  {
-    %RESUL = %{ $aux->[0] };
-  }
-
-  return %RESUL;
 }
 
 #Devuelve los hechos abiertos de un OBJETO. Devuelve registros completos
@@ -287,6 +235,65 @@ sub GetOpenFacts(\%$$)
   {
     $RESUL{$clave} = $aux{$clave}{'VALOR'};
   }
+  return %RESUL;
+}
+
+=pod
+sub ReopenFacts(\%$$\%$;$)
+{
+  my $CONFIG  = shift;
+  my $tipoOBJ = shift;
+  my $objID   = shift;
+  my $DATOS   = shift;
+  my $ruser   = shift;
+  my $tevent  = shift || time();
+
+  my ( %tempfacts, %lastclosed );
+
+  %lastclosed = %{ GetLatestClosedFacts( %$CONFIG, $tipoOBJ, $objID ) };
+
+  foreach my $clave ( keys %lastclosed )
+  {
+    $tempfacts{$clave} = $lastclosed{$clave}{'VALOR'};
+  }
+  foreach my $clave ( keys %$DATOS )
+  {
+    $tempfacts{$clave} = $DATOS->{$clave};
+  }
+  foreach my $clave ( keys %tempfacts )
+  {
+    OpenFact( %$CONFIG, $tipoOBJ, $objID, $clave, $tempfacts{$clave}, $ruser,
+      $tevent );
+  }
+}
+
+
+#Devuelve el hecho abierto 'clave' de una persona 'persid'
+sub GetOpenFact(\%$$$)
+{
+  my $CONFIG  = shift;
+  my $tipoOBJ = shift;
+  my $objID   = shift;
+  my $clave   = shift;
+
+  my ( %RESUL, $aux );
+
+  my $sentSQL = qq/
+                  select * from DATAFACTS where TIPOOBJ=?
+                                            and OBJ_id=?
+                                            and CLAVE=?
+                                            and TFIN is NULL
+                /;
+
+  $aux = EjecutaConsultaBD( %$CONFIG, $sentSQL, $tipoOBJ, $objID, $clave );
+
+  %RESUL = ();
+
+  if (@$aux)
+  {
+    %RESUL = %{ $aux->[0] };
+  }
+
   return %RESUL;
 }
 
@@ -409,5 +416,6 @@ sub GetOpenFactsByClave(\%$$)
   }
   return \%RESUL;
 }
+=cut
 
 1;
