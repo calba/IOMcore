@@ -13,7 +13,8 @@ $VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf "%d."."%02d" x $#
 @EXPORT      = @EXPORT_OK= qw(EjecutaConsultaBD ConectarBD DesconectarBD
                               PreparaSentenciaBD EjecutaSentenciaBD
                               EjecutaSentenciaPrep EjecutaConsultaPrep
-                              ComienzaTransaccion Commit Rollback);
+                              ComienzaTransaccion Commit Rollback
+                              Tablas Columnas);
 %EXPORT_TAGS = ( );
 
 ##########################################################################
@@ -34,6 +35,8 @@ sub ComienzaTransaccion(\%);
 sub Commit(\%);
 sub Rollback(\%);
 
+sub Tablas(\%);
+sub Columnas(\%$);
 
 sub ConectarBD(\%;$)
 { my $CONFIG=shift;
@@ -46,6 +49,7 @@ sub ConectarBD(\%;$)
                                     PrintError => 1,
                                     AutoCommit => $autocommit,
                                   });
+
   if (!$CONFIG->{'DBH'})
   { return "Error connecting: ".$DBI::errstr;
   };
@@ -248,5 +252,54 @@ sub ComienzaTransaccion(\%)
 
   return $resul;
 };
+
+sub Tablas(\%)
+{ my $CONFIG=shift;
+  my ($sth,@resul,$tablas);
+
+  $sth= $CONFIG->{'DBH'}->table_info(undef,undef,undef,undef );
+
+  unless ($sth) {
+    printLOG(%$CONFIG,"Tablas: table_info error: ", $CONFIG->{'DBH'}->errstr);
+    return @resul;
+  }
+  $tablas = $sth->fetchall_arrayref();
+
+  foreach my $i (@$tablas)
+  { push @resul,$i->[2];
+  };
+
+  return @resul;
+}
+
+sub Columnas(\%$)
+{ my $CONFIG=shift;
+  my $TABLA=shift;
+
+  my ($sth,@resul,%auxtablas,$columnas);
+
+  map { $auxtablas{$_}++; } (Tablas(%$CONFIG));
+
+  unless (defined($auxtablas{$TABLA}))
+  {
+    printLOG(%$CONFIG,"Columnas: tabla '$TABLA' no existe.");
+    return @resul;
+  }
+
+  $sth= $CONFIG->{'DBH'}->column_info(undef,undef,$TABLA,undef );
+
+  unless ($sth) {
+    printLOG(%$CONFIG,"Columnas: column_info error: ", $CONFIG->{'DBH'}->errstr);
+    return @resul;
+  };
+
+  $columnas = $sth->fetchall_arrayref();
+
+  foreach my $i (@$columnas)
+  { push @resul,$i->[3];
+  };
+
+  return @resul;
+}
 
 1;
