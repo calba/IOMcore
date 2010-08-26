@@ -22,7 +22,7 @@ use Data::Dumper;
 
   use IOMCore::FichDmp;
 
-  Cargar 
+  Cargar
   %VarGrabada=%{CargaDump("FichDmp")};
   @VarGrabada=@{CargaDump("FichDmp")};
 
@@ -38,16 +38,16 @@ sub GrabaDump($$)
   my $datos=shift;
   local *HANDOUT;
   my $cadenaGZ;
-  
+
   $cadenaGZ=($fichero=~ m#\.gz$#)?"| gzip -9 > $fichero ":">$fichero";
 
   open(HANDOUT,"$cadenaGZ") || do
   { print STDERR "No pude grabar el fichero $fichero: $!\n";
-    return 1;
+    return 0;
   };
-  print HANDOUT Dumper($datos) || return 1;
-  close(HANDOUT) && return 0;
-  return 1;
+  print HANDOUT Dumper($datos) || return 0;
+  close(HANDOUT) && return 1;
+  return 0;
 };
 
 #CargaDump(fichero)
