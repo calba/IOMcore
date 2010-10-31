@@ -9,10 +9,10 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
 # if using RCS/CVS, this may be preferred
 $VERSION = do { my @r = (q$Revision: 1.14 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
 @ISA         = qw(Exporter);
-@EXPORT_OK = @EXPORT = qw(&LeeFestivos &Dias2FechaDC &FechaDMY2Dias 
+@EXPORT_OK = @EXPORT = qw(LeeFestivos Dias2FechaDC FechaDMY2Dias FechaYMD2Dias
                   &FechaBD2Dias &Dias2FechaYMD &Dias2FechaDMY &Dias2DiaSem
                   Dias2Time Time2Dias Dias2NumDiaSem Time2FechaHora
-                  Hoy2Dias PubDate2Time Time2FechaYMD Time2YMDHMS 
+                  Hoy2Dias PubDate2Time Time2FechaYMD Time2YMDHMS
                   TimestampMy2Time
                   );
 # as well as any optionally exported functions
@@ -26,7 +26,7 @@ my @DiasSem=qw( - L M X J V S D );
 sub LeeFestivos($)
 { my $fichconf=shift;
   my (%resul,@resul,$linea);
-  
+
   @resul=();
 
   open(HANDIN,$fichconf) || do
@@ -68,7 +68,7 @@ sub Dias2FechaDMY($;$)
 
 sub Dias2FechaYMD($;$)
 { my $dias=shift;
-  my $sep=shift||"/";
+  my $sep=shift||"";
   my ($y,$m,$d);
   ($y,$m,$d)=Add_Delta_Days(1,1,1, $dias - 1);
 
@@ -85,10 +85,22 @@ sub Dias2FechaDC($)
 sub FechaDMY2Dias($)
 { my $fecha=shift;
   my ($anno,$mes,$dia);
-  if ($fecha =~ m#(\d{1,2})[/-](\d{1,2})[/-](\d{4})#)
+  if ($fecha =~ m#(\d{1,2})[/-]?(\d{1,2})[/-]?(\d{4})#)
   { ($dia,$mes,$anno)=($1,$2,$3);
   } else
   { ($dia,$mes,$anno)=(0,0,0);
+  };
+  return (check_date($anno,$mes,$dia))?Date_to_Days($anno,$mes,$dia):0;
+};
+
+##FUNCION FechaYMD2Dias($fecha)
+sub FechaYMD2Dias($)
+{ my $fecha=shift;
+  my ($anno,$mes,$dia);
+  if ($fecha =~ m#(\d{4})[/-]?(\d{1,2})[/-]?(\d{1,2})#)
+  { ($anno,$mes,$dia)=($1,$2,$3);
+  } else
+  { ($anno,$mes,$dia)=(0,0,0);
   };
   return (check_date($anno,$mes,$dia))?Date_to_Days($anno,$mes,$dia):0;
 };
@@ -167,7 +179,7 @@ sub PubDate2Time($)
   my ($dia,$mes,$year,$hora,$min,$seg,$TZ);
 
   my %meses= ( 'jan' =>1,
-               'january' =>1, 
+               'january' =>1,
                'feb' =>2,
                'february' =>2,
                'mar' =>3,
@@ -197,7 +209,7 @@ sub PubDate2Time($)
                'dic' =>12);
 
   return 0 unless defined($pubdate);
-  
+
 #<pubDate>Fri, 22 Apr 2005 16:22:45 GMT</pubDate>
   if ($pubdate =~ m!(:?.*),\s+
                     (\d{1,2})\s+
@@ -232,7 +244,7 @@ sub PubDate2Time($)
     return timelocal(0, 0, 0, $dia, $mes-1, $year-1900);
   } elsif ($pubdate =~ m!((:?\w+),\s+)?
                          (\w+)\.?\s+
-                         (\d{1,2}),\s+                    
+                         (\d{1,2}),\s+
                          (\d{4})
                          (\s+(\d{2}):(\d{2})(:(\d{2})))?
                          (\s+(.+))?
@@ -252,7 +264,7 @@ sub PubDate2Time($)
                       "Devuelve 0.\n";
       return 0;
     };
-    
+
     return timelocal($seg, $min, $hora, $dia, $nummes-1, $year-1900);
   } else
   { print STDERR "IOMCore::Fechas. PubDate2Time. Parametro no casa la RE ",
