@@ -66,12 +66,12 @@ sub CargaDump($)
     return $VAR1;
   };
   eval(join(" ",<HANDIN>));
-  close(HANDIN);
   if ($@)
   { print STDERR "Error al evaluar el contenido del fichero $fichero: $@\n";
   } else
   { $datos=$VAR1;
   };
+  close(HANDIN);
   return $datos;
 };
 
