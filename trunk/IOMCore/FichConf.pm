@@ -70,8 +70,8 @@ sub LeeFichConf(\%\%$)
        $VALMODO=$valor;
        next LOO;
      };
-     if ($MODO && 
-         ($VALMODO ne "") && 
+     if ($MODO &&
+         ($VALMODO ne "") &&
          defined($PARSECONF{'SUBBASES'}{$MODO}{$clave})
         )
      { if ($PARSECONF{'SUBBASES'}{$MODO}{$clave}{'TIPO'} eq "\$")
@@ -107,7 +107,7 @@ sub GenConfParser(\%)
 
     foreach $clave (@{$ConfBase->{'BASE'}})
     { my ($tipo,$nombre);
-      
+
       next unless ($clave);
 
       $clave =~ m#^(\$|@)?(.+)$# ;
@@ -129,7 +129,7 @@ sub GenConfParser(\%)
 
     foreach $clave (keys %{$ConfBase->{'CLAVEPRI'}})
     { my ($subclave);
-      
+
       next unless ($clave);
 
       if ($clave =~ m#^(FIN)$# )
@@ -179,7 +179,7 @@ sub EliminaDuplisArray(\@)
   my (%hashaux,@auxi);
 
   map { $hashaux{$_}++; } (@{$array});
-  @{$array}=(sort (keys %hashaux));
+  @{$array}=grep { $hashaux{$_}<2 }(@$array);
 };
 
 sub HazLimpieza(\%)
@@ -192,7 +192,7 @@ sub HazLimpieza(\%)
     $tipo=ref($CONFIG->{$clave});
 
     $_=$tipo;
-    LOO1: 
+    LOO1:
     { /SCALAR/ && next LOO1;
       /ARRAY/ && do
       { EliminaDuplisArray(@{$CONFIG->{$clave}});
@@ -206,9 +206,9 @@ sub HazLimpieza(\%)
   };
 };
 
-#Lee el fichero de descripciÛn de la gram·tica del fichero (que es un fichero de
-#configuraciÛn en sÌ mismo) y devuelve la variable que permite la interpretaciÛn
-#del fichero de configuraciÛn 
+#Lee el fichero de descripci√≥n de la gram√°tica del fichero (que es un fichero de
+#configuraci√≥n en s√≠ mismo) y devuelve la variable que permite la interpretaci√≥n
+#del fichero de configuraci√≥n
 sub LeeFichConfParser($)
 { my $fichero=shift;
   my %RESUL=();
@@ -220,7 +220,7 @@ sub LeeFichConfParser($)
 
   return %RESUL;
 };
-  
+
 sub Lista2Hash(\%$$)
 { my $CONFIG=shift;
   my $claveLista=shift;
@@ -229,7 +229,7 @@ sub Lista2Hash(\%$$)
   do
   { printLOG(%$CONFIG,"Variable $claveLista no definida o es del tipo escalar");
     return;
-  } unless (defined($CONFIG->{$claveLista}) && 
+  } unless (defined($CONFIG->{$claveLista}) &&
                                       (ref($CONFIG->{$claveLista}) eq "ARRAY"));
 
   do
@@ -241,19 +241,19 @@ sub Lista2Hash(\%$$)
 };
 
 
-#Devuelve con una closure de una funciÛn de lectura de fichero de configuraciÛn
+#Devuelve con una closure de una funci√≥n de lectura de fichero de configuraci√≥n
 #susceptible de ser usada como callback por GetOptions.
-#Uso: 
-#Como opciÛn en GetOptions:
-#  my @OPTIONS = ( ... 
+#Uso:
+#Como opci√≥n en GetOptions:
+#  my @OPTIONS = ( ...
 #                  'c=s' => ConfParser(%CONFIG,$gramBASE),
 #                  ...
 #              );
 #...
 #GetOptions(\%CONFIG,@OPTIONS);
-#grambase es la ubicaciÛn del fichero que contiene la descripciÛn YA ADAPTADA 
-#del fichero de configuraciÛn
-#CONFIG es la variable que va a almacenar la configuraciÛn leÌda del fichero
+#grambase es la ubicaci√≥n del fichero que contiene la descripci√≥n YA ADAPTADA
+#del fichero de configuraci√≥n
+#CONFIG es la variable que va a almacenar la configuraci√≥n le√≠da del fichero
 sub ConfParser(\%$)
 { my $CONFIG=shift;
   my $gramaBase=shift;
@@ -262,14 +262,14 @@ sub ConfParser(\%$)
   { my ($nada,$fichconf)=@_;
     our %ConfParser;
 
-    #Carga de la gram·tica
+    #Carga de la gram√°tica
     require $gramaBase;
 
-    #Lectura de fichero de configuraciÛn
+    #Lectura de fichero de configuraci√≥n
     LeeFichConf(%$CONFIG,%ConfParser,$fichconf);
   };
-  
-  return $resul;  
+
+  return $resul;
 }
 
 1;
