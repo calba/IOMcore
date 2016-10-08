@@ -273,8 +273,8 @@ sub PubDate2Time($)
   };
 };
 
-sub Time2FechaYMD($;$)
-{ my $time=shift;
+sub Time2FechaYMD(;$$)
+{ my $time=shift||time();
   my $sep=shift||"";
   my ($dia,$mes,$year);
 
