@@ -38,6 +38,8 @@ sub GrabaDump($$)
   my $datos=shift;
   local *HANDOUT;
   my $cadenaGZ;
+  my $olddeep=$Data::Dumper::Deepcopy;
+  my $oldpurity=$Data::Dumper::Purity;
 
   $cadenaGZ=($fichero=~ m#\.gz$#)?"| gzip -9 > $fichero ":">$fichero";
 
@@ -45,7 +47,12 @@ sub GrabaDump($$)
   { print STDERR "No pude grabar el fichero $fichero: $!\n";
     return 0;
   };
+  $Data::Dumper::Deepcopy=1;
+  $Data::Dumper::Purity=1;
   print HANDOUT Dumper($datos) || return 0;
+  $Data::Dumper::Deepcopy=$olddeep;
+  $Data::Dumper::Purity=$oldpurity;
+  
   close(HANDOUT) && return 1;
   return 0;
 };
