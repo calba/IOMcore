@@ -14,8 +14,6 @@ $VERSION = do { my @r = (q$Revision: 1.7 $ =~ /\d+/g); sprintf "%d."."%02d" x $#
 
 use strict;
 use diagnostics;
-use FindBin qw($Bin);
-use lib "$Bin/..";
 
 use Data::Dumper;
 
@@ -31,7 +29,7 @@ sub ConfParser(\%$);
 sub LeeFichConf(\%\%$)
 { my $CONFIG=shift;
   my $ConfParser=shift;
-  my $fichconf=shift;
+  my $fichconf=do_untaint(shift);
 
   local *HANDIN;
   my ($clave,%PARSECONF,$linea,$MODO,$VALMODO,%CONFAUX);

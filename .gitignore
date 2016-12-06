@@ -1,0 +1,7 @@
+/blib/
+/Makefile
+/MYMETA.json
+/MYMETA.yml
+/pm_to_blib
+Makefile.old
+/IOMCore-1.0.tar.gz

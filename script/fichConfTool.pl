@@ -5,8 +5,6 @@
 use strict;
 use diagnostics;
 
-use FindBin;
-use lib "$FindBin::Bin/..";
 
 use Getopt::Long;
 use Data::Dumper;
@@ -66,7 +64,7 @@ if (defined($CONFIG{'GCONFIPARSERST'}))
 
   VuelcaHash($fichname,$CONFIG{'GCONFIPARSERST'},%ConfParser);
   exit 0;
-} 
+}
 
 if (defined($CONFIG{'GCONFIPARSERPM'}))
 { my $fichname;
@@ -82,7 +80,7 @@ if (defined($CONFIG{'GCONFIPARSERPM'}))
 
   VuelcaModulo($fichname,$CONFIG{'GCONFIPARSERPM'},"ConfParser",%ConfParser);
   exit 0;
-} 
+}
 
 
 do
@@ -97,14 +95,14 @@ foreach $fichconf (@ARGV)
 if (defined($CONFIG{'ENTORNO'}))
 { my ($clave,@claves);
 
-  @claves=grep { !(ref($ConfDatos{$_})) || 
+  @claves=grep { !(ref($ConfDatos{$_})) ||
                   (ref($ConfDatos{$_}) eq "ARRAY"); } (keys %ConfDatos);
 
   if (@claves)
   { map { if (ref($ConfDatos{$_}))
           { print "$_=\"".join($CONFIG{'SEPARADOR'},@{$ConfDatos{$_}})."\"\n";
           } else
-          { print "$_=\"$ConfDatos{$_}\"\n"; 
+          { print "$_=\"$ConfDatos{$_}\"\n";
           }
         } (@claves);
     print "export ","@claves ","\n";
@@ -153,12 +151,12 @@ sub Ayuda($$)
 
 fichConfTool.pl: Herramienta auxiliar para manejo de ficheros de configuracion
 
-Uso: 
+Uso:
 fichConfTool.pl [-h][-?] {-cf sintaxis.cfg | -cm sintaxis.pm} { -pp modulossint.pm | -ps modulosint.pl | -xp datosconf.pm | -xs datosconf.pl | -e [-s sep]} [-o fichsalida] ficheroconf.cfg ...
 
 -h Esta pantalla
 -? Esta pantalla
--cf sintaxis.cfg Sintaxis del fichero de configuracion 
+-cf sintaxis.cfg Sintaxis del fichero de configuracion
 -cm sintaxis.pm Modulo perl que contiene la sintaxis del fichero de conf.
 -pp modulossint.pm Genera un modulo perl susceptible de ser importado por cm
 -ps nombrehash Genera un fichero con un hash susceptible de require o C&P
@@ -168,7 +166,7 @@ fichConfTool.pl [-h][-?] {-cf sintaxis.cfg | -cm sintaxis.pm} { -pp modulossint.
                como variables de entorno. Ideal para hacer 'eval'.
 -s separador Separador de los campos que formarn los arrays que salen con -e
             Por defecto: espacio
--o fichsalida Nombre del fichero de salida. Por defecto: salida estándar.
+-o fichsalida Nombre del fichero de salida. Por defecto: salida estï¿½ndar.
 
 FIN
   exit 1;
