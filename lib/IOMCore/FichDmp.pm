@@ -35,7 +35,7 @@ use Data::Dumper;
 #GrabaDump(fichero,refadatos)
 sub GrabaDump($$)
 {
-  my $fichero = un_taint(shift);
+  my $fichero = do_untaint(shift);
   my $datos   = shift;
   local *HANDOUT;
   my $cadenaGZ;
@@ -62,7 +62,7 @@ sub GrabaDump($$)
 #CargaDump(fichero)
 sub CargaDump($)
 {
-  my $fichero = un_taint(shift);
+  my $fichero = do_untaint(shift);
   my ( $datos, $VAR1 );
   local *HANDOUT;
   my $cadenaGZ;
@@ -96,6 +96,6 @@ sub do_untaint($)
   {    #allow filename to be [a-zA-Z0-9_]
     die("Tainted");
   }
-  return $;
+  return $1;
 }
 1;
