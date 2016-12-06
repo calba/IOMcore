@@ -1,6 +1,6 @@
 Makefile.PL
 MANIFEST
-lib/IOMCore.pm
+lib/IOMCore_Version.pm
 lib/IOMCore/FichConf.pm
 lib/IOMCore/FichDmp.pm
 #lib/IOMCore/DataFacts

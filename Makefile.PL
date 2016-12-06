@@ -2,7 +2,8 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
   NAME         => 'IOMCore',
-  VERSION_FROM => 'lib/IOMCore.pm',
+  AUTHOR => 'ols@apdo.com',
+  VERSION_FROM => 'lib/IOMCore_Version.pm',
   
   META_MERGE   => {
                   'meta-spec' => { version => 2 },
