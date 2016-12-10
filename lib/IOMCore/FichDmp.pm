@@ -96,6 +96,6 @@ sub do_untaint($)
   {    #allow filename to be [a-zA-Z0-9_]
     die("Tainted");
   }
-  return $_;
+  return $1;
 }
 1;
