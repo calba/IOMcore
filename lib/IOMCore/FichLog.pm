@@ -29,7 +29,7 @@ sub printLOG(\%@)
   my $linea;
   local *HANDERR;
 
-  $cadena=join("",@_);
+  $cadena=join(" ",@_);
   $linea = scalar(localtime)." [$$] $cadena\n";
 
   if (defined($CONFIG->{'LOGFILE'}))
@@ -45,7 +45,7 @@ sub printLOG(\%@)
   close HANDERR if ($flag);
 };
 
-#Alias de printLOG (hecho para distinguir de los printLOG y para facilitar la 
+#Alias de printLOG (hecho para distinguir de los printLOG y para facilitar la
 #eliminacion
 sub TRAZA(\%@)
 { my $CONFIG=shift;
