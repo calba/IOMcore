@@ -22,5 +22,7 @@ lib/IOMCore/DataFacts.pm
 lib/IOMCore/WebMensajes.pm
 lib/IOMCore/LeeLDIF.pm
 lib/IOMCore/ConsultaBD.pm
+lib/IOMCore/IPaddress.pm
+
 script/fichConfTool.pl
 
