@@ -37,7 +37,7 @@ GITRELEASE="${GITCOUNT}.${MODULEbranch}.${GITHASH}"
 
 TGZDIRNAME="perl-${MODULE}-${PKGVERSION}"
 
-(cd $WRKDIR ; mkdir ${TGZDIRNAME}; cp -r wrk/* $WRKDIR/${TGZDIRNAME} ; tar czvf ${TGZDIRNAME}.tar.gz ${TGZDIRNAME})
+(cd $WRKDIR ; mkdir ${TGZDIRNAME}; cp -r wrk/M* wrk/lib wrk/script $WRKDIR/${TGZDIRNAME} ; tar czvf ${TGZDIRNAME}.tar.gz ${TGZDIRNAME})
 
 cpan2rpm --mk-rpm-dirs ${WRKDIR}
 cpan2rpm $WRKDIR/${TGZDIRNAME}.tar.gz --source ${TGZDIRNAME}.tar.gz --no-sign \
