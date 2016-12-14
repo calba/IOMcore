@@ -16,7 +16,8 @@ then
   exit 1
 fi
 
-MODULErepo=$(cd $DIRNAME ; git remote get-url origin)
+#MODULErepo=$(cd $DIRNAME ; git remote get-url origin)
+MODULErepo=$(cd $DIRNAME ; git remote -v  | grep origin | head -n 1 | awk '{print $2}' )
 MODULEbranch=${BRANCH:-master}
 
 WRKDIR=$(mktemp -d)

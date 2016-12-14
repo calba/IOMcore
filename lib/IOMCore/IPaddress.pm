@@ -15,6 +15,8 @@ $VERSION = "1.0";
 %EXPORT_TAGS = ();
 
 ##########################################################################
+use Net::IP;
+
 sub String2Address(\%$);
 sub String2PlainAddressString(\%$);
 sub Address2String(\%$;$);
@@ -28,7 +30,7 @@ sub String2Address(\%$)
 
   my ( $IPadd, $IPaddSTR );
 
-  #print STDERR "String2IPObj: $string  Antes.\n";
+  #print STDERR "String2Address: $string  Antes.\n";
   defined( $CONFIG->{'_CACHE'}{'_IPOBJS'}{$string} )
     and return $CONFIG->{'_CACHE'}{'_IPOBJS'}{$string};
 
@@ -38,13 +40,13 @@ sub String2Address(\%$)
     {
       my $errorSTR = Net::IP->Error();
       print STDERR
-        "String2IPObj: address '$string' not valid: $errorSTR . Skipping.\n";
+        "String2Address: address '$string' not valid: $errorSTR . Skipping.\n";
       return $IPadd;
     };
 
   };
 
-  #print STDERR "String2IPObj: $string ",Dumper($IPadd);
+  #print STDERR "String2Address: $string ",Dumper($IPadd);
 
   $CONFIG->{'_CACHE'}{'_IPOBJS'}{$string} = $IPadd;
   $IPaddSTR = Address2String( %$CONFIG, $IPadd );
@@ -62,23 +64,23 @@ sub String2PlainAddressString(\%$)
 
   my ( $IPadd, $IPaddSTR );
 
-  #print STDERR "String2IPObj: $string  Antes.\n";
+  #print STDERR "String2Address: $string  Antes.\n";
   defined( $CONFIG->{'_CACHE'}{'_IPOBJS'}{$string} )
     and return ( $CONFIG->{'_CACHE'}{'_IPOBJS'}{$string} )->ip();
 
   do
   {
-    $IPadd = Net::IP->new($string) || do
+    $IPadd = String2Address(%$CONFIG,$string) || do
     {
       my $errorSTR = Net::IP->Error();
       print STDERR
-        "String2IPObj: address '$string' not valid: $errorSTR . Skipping.\n";
+        "String2Address: address '$string' not valid: $errorSTR . Skipping.\n";
       return $IPadd;
     };
 
   };
 
-  #print STDERR "String2IPObj: $string ",Dumper($IPadd);
+  #print STDERR "String2Address: $string ",Dumper($IPadd);
 
   $CONFIG->{'_CACHE'}{'_IPOBJS'}{$string} = $IPadd;
   $IPaddSTR = Address2String( %$CONFIG, $IPadd );
@@ -114,7 +116,7 @@ sub CompareAddresses(\%$$)
   my ( $A, $B );
 
   $A = ( String2Address( %$CONFIG, $a ) )->intip();
-  $B = ( String2IPObj( %$CONFIG, $b ) )->intip();
+  $B = ( String2Address( %$CONFIG, $b ) )->intip();
 
   return ( $A->bcmp($B) );
 }
