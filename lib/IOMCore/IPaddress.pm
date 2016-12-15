@@ -147,14 +147,15 @@ sub AddressBelongsToNet(\%$$)
   my ( $IPobj, $NETobj );
 
   $IPobj =
-    ( blessed($address) eq "Net::IP" )
+    ( (blessed($address) || "") eq "Net::IP" )
     ? $address
     : String2Address( %$CONFIG, $address );
   $NETobj =
-    ( blessed($net) eq "Net::IP" )
+    ( (blessed($net) || "") eq "Net::IP" )
     ? $net
     : String2Address( %$CONFIG, $net );
 
   return ( $NETobj->overlaps($IPobj) == $IP_B_IN_A_OVERLAP );
 };
+
 1;
