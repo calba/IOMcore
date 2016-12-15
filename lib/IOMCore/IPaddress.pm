@@ -9,19 +9,21 @@ use Exporter;
 $VERSION = "1.0";
 @ISA     = qw(Exporter);
 
-@EXPORT      = qw( String2Address  String2PlainAddressString Address2String
-                   CompareAddresses AddressType );
+@EXPORT = qw( String2Address  String2PlainAddressString Address2String
+  CompareAddresses AddressType AddressBelongsToNet );
 @EXPORT_OK   = @EXPORT;
 %EXPORT_TAGS = ();
 
 ##########################################################################
 use Net::IP;
+use Scalar::Util qw( blessed );
 
 sub String2Address(\%$);
 sub String2PlainAddressString(\%$);
 sub Address2String(\%$;$);
 sub CompareAddresses(\%$$);
 sub AddressType($);
+sub AddressBelongsToNet(\%$$);
 
 sub String2Address(\%$)
 {
@@ -70,7 +72,7 @@ sub String2PlainAddressString(\%$)
 
   do
   {
-    $IPadd = String2Address(%$CONFIG,$string) || do
+    $IPadd = String2Address( %$CONFIG, $string ) || do
     {
       my $errorSTR = Net::IP->Error();
       print STDERR
@@ -133,8 +135,26 @@ sub AddressType($)
   for my $type ( keys %IPsegments )
   {
     $IPobj->overlaps( $IPsegments{$type} ) and return $type;
-  };
+  }
   return "public";
 }
 
+sub AddressBelongsToNet(\%$$)
+{
+  my $CONFIG  = shift;
+  my $address = shift;
+  my $net     = shift;
+  my ( $IPobj, $NETobj );
+
+  $IPobj =
+    ( blessed($address) eq "Net::IP" )
+    ? $address
+    : String2Address( %$CONFIG, $address );
+  $NETobj =
+    ( blessed($net) eq "Net::IP" )
+    ? $net
+    : String2Address( %$CONFIG, $net );
+
+  return ( $NETobj->overlaps($IPobj) == $IP_B_IN_A_OVERLAP );
+};
 1;
