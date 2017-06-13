@@ -26,6 +26,7 @@ sub HazLimpieza(\%);
 sub LeeFichConf(\%\%$);
 sub ConfParser(\%$);
 
+sub do_untaint($);
 my @emptyArray;
 
 sub LeeFichConf(\%\%$)
@@ -291,5 +292,16 @@ sub DumpConfig(\%;$@)
 
   return "$extraSTR" . join( "\n", @lines );
 }
+
+sub do_untaint($)
+{
+  my $arg = shift;
+
+  unless ( $arg =~ m#^(((([\w_.]|-)*)/)*(([\w_.]|-)+))$# )
+  {    #allow filename to be [a-zA-Z0-9_]
+    die("Tainted");
+  }
+  return $1;
+};
 
 1;
