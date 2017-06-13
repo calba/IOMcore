@@ -165,11 +165,11 @@ sub CIDR2mask($)
 
   #Taken from https://jmorano.moretrix.com/2010/08/calculate-netmask-in-perl/
 
-  my $_bit = ( 2**( 32 - $CIDR ) ) - 1;
+  my $_bit = ( 2**(32- $CIDR ) ) - 1;
   my ($full_mask) =
     unpack( "N", pack( "C4", split( /./, '255.255.255.255' ) ) );
   my $netmask =
-    join( '.', unpack( "C4", pack( "N", ( $full_mask ^ $_bit ) ) ) );
+    join( '.', unpack( "C4", pack( "N", ( $full_mask - $_bit -1 ) ) ) );
 
   return $netmask;
 
