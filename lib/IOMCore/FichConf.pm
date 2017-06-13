@@ -8,7 +8,7 @@ $VERSION = do { my @r = (q$Revision: 1.7 $ =~ /\d+/g); sprintf "%d."."%02d" x $#
 @ISA = qw(Exporter);
 
 @EXPORT_OK = @EXPORT = qw(LeeFichConf ParseFich GenConfParser ConfParser
-                          LeeFichConfParser Lista2Hash);
+                          LeeFichConfParser Lista2Hash DumpConfig);
 
 ##########################################################################
 
@@ -25,6 +25,9 @@ sub EliminaDuplisArray(\@);
 sub HazLimpieza(\%);
 sub LeeFichConf(\%\%$);
 sub ConfParser(\%$);
+
+sub do_untaint($);
+my @emptyArray;
 
 sub LeeFichConf(\%\%$)
 { my $CONFIG=shift;
@@ -269,5 +272,36 @@ sub ConfParser(\%$)
 
   return $resul;
 }
+
+#Returns the Dumper of the CONFIG hash with the values of certain keys hidden
+sub DumpConfig(\%;$@)
+{
+  my $CONFIG = shift;
+  my $extraSTR = shift || "";
+  my @keys2embezzle = @_;
+
+  my @lines = split( /\n/, Dumper($CONFIG) );
+
+  foreach my $key (@keys2embezzle)
+  {
+    #my $regex=qr("^(\s*'$key' =>)\s*'[^']*',");
+    my $regex = qr#^(\s*'$key'\s+=>\s+)'.*',#;
+    map { s/$regex/$1 '*************'/ } @lines;
+    #map { ( $_ =~ m/$regex/ ) and print "---- $_\n" } @lines;
+  }
+
+  return "$extraSTR" . join( "\n", @lines );
+}
+
+sub do_untaint($)
+{
+  my $arg = shift;
+
+  unless ( $arg =~ m#^(((([\w_.]|-)*)/)*(([\w_.]|-)+))$# )
+  {    #allow filename to be [a-zA-Z0-9_]
+    die("Tainted");
+  }
+  return $1;
+};
 
 1;
